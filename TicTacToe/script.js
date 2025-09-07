@@ -68,7 +68,7 @@ const winningConditions = [
 
 const translations = {
     id: {
-        gameTitle: "Tic Tac Te",
+        gameTitle: "Tic Tac Toe",
         playerXTurn: "Giliran Pemain X",
         playerOTurn: "Giliran Pemain O",
         roundWon: (name) => `${name} Memenangkan Babak Ini!`,
@@ -103,7 +103,7 @@ const translations = {
         flag: "https://flagcdn.com/id.svg"
     },
     en: {
-        gameTitle: "Tic ac Toe",
+        gameTitle: "Tic Tac Toe",
         playerXTurn: "Player X's Turn",
         playerOTurn: "Player O's Turn",
         roundWon: (name) => `${name} Wins This Round!`,
@@ -488,5 +488,6 @@ window.addEventListener('load', () => {
     setLanguage('id');
     chooseP1Start.classList.add('selected');
 });
+
 
 
