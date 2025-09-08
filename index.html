@@ -12,21 +12,61 @@
     <!-- Main Menu Screen -->
     <div id="mainMenuScreen" class="menu-screen active">
         <h1 id="mainMenuTitle">Tic Tac Toe</h1>
-        <button id="newGameBtn" class="menu-btn">Permainan Baru</button>
+        <div class="main-menu-buttons">
+            <button id="newGameBtn" class="menu-btn">Permainan Baru</button>
+            <div class="secondary-buttons-container">
+                <button id="howToPlayOpenBtn" class="menu-btn secondary icon-btn" aria-label="Cara Bermain" title="Cara Bermain">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                </button>
+                <button id="rulesOpenBtn" class="menu-btn secondary icon-btn" aria-label="Aturan" title="Aturan">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                </button>
+            </div>
+        </div>
     </div>
+    
+    <!-- Rules Modal -->
+    <div id="rulesModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-tabs">
+                <button class="tab-link active" data-tab="howToPlayTab" id="howToPlayTabBtn">Cara Bermain</button>
+                <button class="tab-link" data-tab="rulesTab" id="rulesTabBtn">Aturan</button>
+            </div>
+            <div id="howToPlayTab" class="tab-content active">
+                 <h2 id="howToPlayTitle">Cara Bermain</h2>
+                 <div id="howToPlayContent" class="rules-text"></div>
+            </div>
+            <div id="rulesTab" class="tab-content">
+                <h2 id="rulesTitle">Aturan Permainan</h2>
+                <div id="rulesContent" class="rules-text"></div>
+            </div>
+            <button id="rules-close-btn" class="menu-btn">Mengerti</button>
+        </div>
+    </div>
+
 
     <!-- Settings Modal -->
     <div id="settingsModal" class="modal">
         <div class="modal-content">
             <h2 id="settingsModalTitle">Pengaturan Permainan</h2>
-            <div class="setting-group">
-                <input type="text" id="p1NameInput" placeholder="Nama Pemain 1 (X)">
-                <input type="text" id="p2NameInput" placeholder="Nama Pemain 2 (O)">
+            
+            <div class="setting-group" id="player-inputs">
+                <div class="player-input-container">
+                    <input type="text" id="p1NameInput" class="styled-input" placeholder="Nama Pemain 1">
+                    <div class="symbol-picker" id="p1-symbol-picker">
+                        <button class="symbol-btn" data-symbol="X">X</button>
+                        <button class="symbol-btn" data-symbol="O">O</button>
+                    </div>
+                </div>
+                <div class="player-input-container">
+                    <input type="text" id="p2NameInput" class="styled-input" placeholder="Nama Pemain 2">
+                    <div class="symbol-picker" id="p2-symbol-picker">
+                        <button class="symbol-btn" data-symbol="X">X</button>
+                        <button class="symbol-btn" data-symbol="O">O</button>
+                    </div>
+                </div>
             </div>
-            <div class="setting-group">
-                <label for="roundSlider"><span id="roundLabelText">Jumlah Babak:</span> <span id="roundValue">3</span></label>
-                <input type="range" id="roundSlider" min="1" max="10" value="3">
-            </div>
+
             <div class="setting-group">
                 <label id="firstTurnLabel">Siapa Mulai Babak 1?</label>
                 <div class="option-group">
@@ -34,6 +74,12 @@
                     <button class="option-btn" id="chooseP2Start">Pemain 2</button>
                 </div>
             </div>
+
+            <div class="setting-group">
+                <label for="roundSlider"><span id="roundLabelText">Jumlah Babak:</span> <span id="roundValue">3</span></label>
+                <input type="range" id="roundSlider" min="1" max="10" value="3">
+            </div>
+            
             <div class="setting-group toggle-group">
                 <label for="alternateTurnsCheck" id="alternateTurnsLabel">Ganti Giliran Awal Tiap Babak</label>
                 <label class="toggle-switch">
@@ -41,6 +87,31 @@
                     <span class="slider round"></span>
                 </label>
             </div>
+             <div class="setting-group toggle-group">
+                <label for="alternateRematchCheck" id="alternateRematchLabel">Ganti Giliran Awal Tiap Pertandingan</label>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="alternateRematchCheck" checked>
+                    <span class="slider round"></span>
+                </label>
+            </div>
+            <div class="setting-group toggle-group">
+                <label for="useColorsCheck" id="useColorsLabel">Gunakan Warna Pemain</label>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="useColorsCheck">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+            <div id="color-picker-container" class="setting-group">
+                <div class="color-picker">
+                    <label id="p1ColorLabel">Warna Pemain 1</label>
+                    <div id="p1-color-options" class="color-options"></div>
+                </div>
+                <div class="color-picker">
+                    <label id="p2ColorLabel">Warna Pemain 2</label>
+                    <div id="p2-color-options" class="color-options"></div>
+                </div>
+            </div>
+            <div id="settings-error" class="error-message"></div>
             <button id="startGameBtn" class="menu-btn">Mulai Bermain!</button>
         </div>
     </div>
@@ -49,14 +120,37 @@
     <div id="recapModal" class="modal">
         <div class="modal-content">
             <h2 id="recapTitle">Hasil Akhir</h2>
+            
+            <div id="recap-nav">
+                <button id="prev-match-btn" class="nav-btn">&lt;</button>
+                <span id="match-counter"></span>
+                <button id="next-match-btn" class="nav-btn">&gt;</button>
+            </div>
+
             <p id="recapWinner" class="recap-final-result"></p>
-            <div id="recap-scores" class="recap-final-scores"></div>
+            
+            <div id="recap-scores-container">
+                <div class="recap-player-score">
+                    <span id="recap-p1-name">Player 1</span>
+                    <div id="recap-p1-score" class="recap-big-score">0</div>
+                </div>
+                <div class="recap-separator">
+                    <div id="recap-h2h-score" class="recap-h2h">(0-0)</div>
+                    <span class="recap-colon">:</span>
+                </div>
+                <div class="recap-player-score">
+                    <span id="recap-p2-name">Player 2</span>
+                    <div id="recap-p2-score" class="recap-big-score">0</div>
+                </div>
+            </div>
+
             <h3 id="recapHistoryTitle">Riwayat Babak</h3>
-            <ul id="recap-round-list"></ul>
+            <div id="recap-timeline-container">
+                <div id="recap-timeline"></div>
+            </div>
             <button id="recap-close-btn" class="menu-btn">Kembali</button>
         </div>
     </div>
-
 
     <!-- Language Dropdown -->
     <div class="language-dropdown-container">
@@ -69,7 +163,7 @@
                     <img src="https://flagcdn.com/id.svg" alt="Bendera Indonesia"> Indonesia
                 </button>
                 <button class="language-option" data-lang="en">
-                    <img src="https://flagcdn.com/us.svg" alt="Bendera Amerika"> English
+                    <img src="https://flagcdn.com/us.svg" alt="Bendera Amerika"> English (US)
                 </button>
             </div>
         </div>
@@ -77,9 +171,10 @@
 
     <!-- Main App Container -->
     <div id="app-container">
+         <div id="confetti-container"></div>
         <div class="game-container">
             <h1 id="gameTitle">Tic Tac Toe</h1>
-            <div id="status" class="status">Giliran Pemain X</div>
+            <div id="status" class="status">&nbsp;</div>
             <div id="board" class="board">
                 <div class="cell" data-index="0"></div>
                 <div class="cell" data-index="1"></div>
@@ -93,7 +188,6 @@
             </div>
             <div class="button-container">
                 <button id="nextRoundBtn">Babak Berikutnya >></button>
-                <!-- Tombol akhir permainan akan ditambahkan di sini oleh JS -->
             </div>
         </div>
         
@@ -102,21 +196,21 @@
                 <h2 id="round-title">Babak</h2>
                 <div id="round-display">1 DARI 3</div>
                 <div class="player-info-container">
-                    <div id="playerXInfo" class="player-info">
+                    <div id="player1Info" class="player-info">
                         <div class="indicator"></div>
                         <div class="player-details">
-                           <span id="playerXTag">Pemain 1 (X)</span>
-                           <span id="playerXName">Pemain X</span>
+                           <span id="player1Tag">Pemain 1</span>
+                           <span id="player1Name">Pemain 1</span>
                         </div>
-                        <span id="playerXScore" class="score">0</span>
+                        <span id="player1Score" class="score">0</span>
                     </div>
-                    <div id="playerOInfo" class="player-info">
+                    <div id="player2Info" class="player-info">
                         <div class="indicator"></div>
                         <div class="player-details">
-                           <span id="playerOTag">Pemain 2 (O)</span>
-                           <span id="playerOName">Pemain O</span>
+                           <span id="player2Tag">Pemain 2</span>
+                           <span id="player2Name">Pemain 2</span>
                         </div>
-                        <span id="playerOScore" class="score">0</span>
+                        <span id="player2Score" class="score">0</span>
                     </div>
                 </div>
                 <div id="round-result-status" class="round-result"></div>
