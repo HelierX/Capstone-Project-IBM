@@ -13,7 +13,10 @@
     <div id="mainMenuScreen" class="menu-screen active">
         <h1 id="mainMenuTitle">Tic Tac Toe</h1>
         <div class="main-menu-buttons">
-            <button id="newGameBtn" class="menu-btn">Permainan Baru</button>
+            <button id="newGameBtn" class="menu-btn icon-text-btn">
+                <svg class="play-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M8 5V19L19 12L8 5Z"/></svg>
+                <span id="newGameBtnText">Permainan Baru</span>
+            </button>
             <div class="secondary-buttons-container">
                 <button id="howToPlayOpenBtn" class="menu-btn secondary icon-btn" aria-label="Cara Bermain" title="Cara Bermain">
                     <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
@@ -27,128 +30,176 @@
     
     <!-- Rules Modal -->
     <div id="rulesModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-tabs">
-                <button class="tab-link active" data-tab="howToPlayTab" id="howToPlayTabBtn">Cara Bermain</button>
-                <button class="tab-link" data-tab="rulesTab" id="rulesTabBtn">Aturan</button>
+        <div class="modal-content-wrapper">
+            <div class="modal-content">
+                <span class="close-button" id="rules-close-btn-x">&times;</span>
+                <div class="modal-tabs">
+                    <button class="tab-link active" data-tab="howToPlayTab" id="howToPlayTabBtn">Cara Bermain</button>
+                    <button class="tab-link" data-tab="rulesTab" id="rulesTabBtn">Aturan</button>
+                </div>
+
+                <div id="howToPlayTab" class="tab-content active">
+                     <h2 id="howToPlayTitle">Cara Bermain</h2>
+                     <div class="modal-sub-tabs">
+                        <button class="sub-tab-link active" data-sub-tab="howToPlayNormal">Normal</button>
+                        <button class="sub-tab-link" data-sub-tab="howToPlaySuper">Super</button>
+                     </div>
+                     <div id="howToPlayNormal" class="sub-tab-content active rules-text"></div>
+                     <div id="howToPlaySuper" class="sub-tab-content rules-text"></div>
+                </div>
+                
+                <div id="rulesTab" class="tab-content">
+                    <h2 id="rulesTitle">Aturan Permainan</h2>
+                    <div id="rulesContent" class="rules-text"></div>
+                </div>
+                <button id="rules-close-btn" class="menu-btn">Mengerti</button>
             </div>
-            <div id="howToPlayTab" class="tab-content active">
-                 <h2 id="howToPlayTitle">Cara Bermain</h2>
-                 <div id="howToPlayContent" class="rules-text"></div>
-            </div>
-            <div id="rulesTab" class="tab-content">
-                <h2 id="rulesTitle">Aturan Permainan</h2>
-                <div id="rulesContent" class="rules-text"></div>
-            </div>
-            <button id="rules-close-btn" class="menu-btn">Mengerti</button>
         </div>
     </div>
 
 
     <!-- Settings Modal -->
     <div id="settingsModal" class="modal">
-        <div class="modal-content">
-            <h2 id="settingsModalTitle">Pengaturan Permainan</h2>
-            
-            <div class="setting-group" id="player-inputs">
-                <div class="player-input-container">
-                    <input type="text" id="p1NameInput" class="styled-input" placeholder="Nama Pemain 1">
-                    <div class="symbol-picker" id="p1-symbol-picker">
-                        <button class="symbol-btn" data-symbol="X">X</button>
-                        <button class="symbol-btn" data-symbol="O">O</button>
+        <div class="modal-content-wrapper">
+            <div class="modal-content">
+                <span class="close-button" id="settings-close-btn-x">&times;</span>
+                <h2 id="settingsModalTitle">Pengaturan Permainan</h2>
+                
+                <div class="setting-group">
+                    <label id="gameModeLabel">Mode Permainan</label>
+                    <div class="option-group game-mode-selector">
+                        <button class="option-btn selected" id="modeNormalBtn" data-mode="normal">Normal</button>
+                        <button class="option-btn" id="modeSuperBtn" data-mode="super">Super</button>
                     </div>
                 </div>
-                <div class="player-input-container">
-                    <input type="text" id="p2NameInput" class="styled-input" placeholder="Nama Pemain 2">
-                    <div class="symbol-picker" id="p2-symbol-picker">
-                        <button class="symbol-btn" data-symbol="X">X</button>
-                        <button class="symbol-btn" data-symbol="O">O</button>
+
+                <div class="setting-group" id="player-inputs">
+                    <div class="player-input-container">
+                        <input type="text" id="p1NameInput" class="styled-input" placeholder="Nama Pemain 1" maxlength="15">
+                        <div class="symbol-picker" id="p1-symbol-picker">
+                            <button class="symbol-btn" data-symbol="X">X</button>
+                            <button class="symbol-btn" data-symbol="O">O</button>
+                        </div>
+                    </div>
+                    <div class="player-input-container">
+                        <input type="text" id="p2NameInput" class="styled-input" placeholder="Nama Pemain 2" maxlength="15">
+                        <div class="symbol-picker" id="p2-symbol-picker">
+                            <button class="symbol-btn" data-symbol="X">X</button>
+                            <button class="symbol-btn" data-symbol="O">O</button>
+                        </div>
                     </div>
                 </div>
-            </div>
+                
+                <div id="round-settings-container">
+                    <div class="setting-group">
+                        <label id="firstTurnLabel">Siapa Mulai Babak 1?</label>
+                        <div class="option-group">
+                            <button class="option-btn" id="chooseP1Start">Pemain 1</button>
+                            <button class="option-btn" id="chooseP2Start">Pemain 2</button>
+                        </div>
+                    </div>
 
-            <div class="setting-group">
-                <label id="firstTurnLabel">Siapa Mulai Babak 1?</label>
-                <div class="option-group">
-                    <button class="option-btn" id="chooseP1Start">Pemain 1</button>
-                    <button class="option-btn" id="chooseP2Start">Pemain 2</button>
+                    <div class="setting-group">
+                        <label><span id="roundLabelText">Jumlah Babak:</span> <span id="roundValue">3</span></label>
+                        <input type="range" id="roundSlider" min="1" max="10" value="3">
+                    </div>
+                    
+                    <div class="setting-group toggle-group">
+                        <div class="toggle-label" id="alternateTurnsLabel">
+                            <span>Ganti Giliran Awal Tiap Babak</span>
+                            <span class="tooltip-icon" data-tooltip-id="alternateTurnsTooltip">?</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="alternateTurnsCheck" checked>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                     <div class="setting-group toggle-group">
+                        <div class="toggle-label" id="alternateRematchLabel">
+                           <span>Ganti Giliran Awal Tiap Pertandingan</span>
+                           <span class="tooltip-icon" data-tooltip-id="alternateRematchTooltip">?</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="alternateRematchCheck" checked>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
                 </div>
-            </div>
+                
+                <div class="setting-group toggle-group tie-breaker-setting">
+                    <div class="toggle-label" id="tieBreakerLabel">
+                        <span>Gunakan Tie-Breaker Saat Seri</span>
+                        <span class="tooltip-icon" data-tooltip-id="tieBreakerTooltip">?</span>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="tieBreakerCheck">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
 
-            <div class="setting-group">
-                <label for="roundSlider"><span id="roundLabelText">Jumlah Babak:</span> <span id="roundValue">3</span></label>
-                <input type="range" id="roundSlider" min="1" max="10" value="3">
-            </div>
-            
-            <div class="setting-group toggle-group">
-                <label for="alternateTurnsCheck" id="alternateTurnsLabel">Ganti Giliran Awal Tiap Babak</label>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="alternateTurnsCheck" checked>
-                    <span class="slider round"></span>
-                </label>
-            </div>
-             <div class="setting-group toggle-group">
-                <label for="alternateRematchCheck" id="alternateRematchLabel">Ganti Giliran Awal Tiap Pertandingan</label>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="alternateRematchCheck" checked>
-                    <span class="slider round"></span>
-                </label>
-            </div>
-            <div class="setting-group toggle-group">
-                <label for="useColorsCheck" id="useColorsLabel">Gunakan Warna Pemain</label>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="useColorsCheck">
-                    <span class="slider round"></span>
-                </label>
-            </div>
-            <div id="color-picker-container" class="setting-group">
-                <div class="color-picker">
-                    <label id="p1ColorLabel">Warna Pemain 1</label>
-                    <div id="p1-color-options" class="color-options"></div>
+                <div class="setting-group toggle-group">
+                    <div class="toggle-label" id="useColorsLabel">Gunakan Warna Pemain</div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="useColorsCheck">
+                        <span class="slider round"></span>
+                    </label>
                 </div>
-                <div class="color-picker">
-                    <label id="p2ColorLabel">Warna Pemain 2</label>
-                    <div id="p2-color-options" class="color-options"></div>
+                <div id="color-picker-container" class="setting-group">
+                    <div class="color-picker">
+                        <label id="p1ColorLabel">Warna Pemain 1</label>
+                        <div id="p1-color-options" class="color-options"></div>
+                    </div>
+                    <div class="color-picker">
+                        <label id="p2ColorLabel">Warna Pemain 2</label>
+                        <div id="p2-color-options" class="color-options"></div>
+                    </div>
                 </div>
+                <div id="settings-error" class="error-message"></div>
+                
+                <button id="startGameBtn" class="menu-btn">
+                     <svg class="play-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M8 5V19L19 12L8 5Z"/></svg>
+                     <span id="startGameBtnText">Mulai Permainan!</span>
+                </button>
             </div>
-            <div id="settings-error" class="error-message"></div>
-            <button id="startGameBtn" class="menu-btn">Mulai Bermain!</button>
         </div>
     </div>
 
     <!-- Post-Match Recap Modal -->
     <div id="recapModal" class="modal">
-        <div class="modal-content">
-            <h2 id="recapTitle">Hasil Akhir</h2>
-            
-            <div id="recap-nav">
-                <button id="prev-match-btn" class="nav-btn">&lt;</button>
-                <span id="match-counter"></span>
-                <button id="next-match-btn" class="nav-btn">&gt;</button>
-            </div>
+        <div class="modal-content-wrapper">
+            <div class="modal-content">
+                 <span class="close-button" id="recap-close-btn-x">&times;</span>
+                <h2 id="recapTitle">Hasil Akhir</h2>
+                
+                <div id="recap-nav">
+                    <button id="prev-match-btn" class="nav-btn">&lt;</button>
+                    <span id="match-counter"></span>
+                    <button id="next-match-btn" class="nav-btn">&gt;</button>
+                </div>
 
-            <p id="recapWinner" class="recap-final-result"></p>
-            
-            <div id="recap-scores-container">
-                <div class="recap-player-score">
-                    <span id="recap-p1-name">Player 1</span>
-                    <div id="recap-p1-score" class="recap-big-score">0</div>
+                <p id="recapWinner" class="recap-final-result"></p>
+                
+                <div id="recap-scores-container">
+                    <div class="recap-player-score">
+                        <span id="recap-p1-name">Player 1</span>
+                        <div id="recap-p1-score" class="recap-big-score">0</div>
+                    </div>
+                    <div class="recap-separator">
+                        <div id="recap-h2h-score" class="recap-h2h">(0-0)</div>
+                        <span class="recap-colon">:</span>
+                    </div>
+                    <div class="recap-player-score">
+                        <span id="recap-p2-name">Player 2</span>
+                        <div id="recap-p2-score" class="recap-big-score">0</div>
+                    </div>
                 </div>
-                <div class="recap-separator">
-                    <div id="recap-h2h-score" class="recap-h2h">(0-0)</div>
-                    <span class="recap-colon">:</span>
-                </div>
-                <div class="recap-player-score">
-                    <span id="recap-p2-name">Player 2</span>
-                    <div id="recap-p2-score" class="recap-big-score">0</div>
-                </div>
-            </div>
 
-            <h3 id="recapHistoryTitle">Riwayat Babak</h3>
-            <div id="recap-timeline-container">
-                <div id="recap-timeline"></div>
+                <h3 id="recapHistoryTitle">Riwayat Babak</h3>
+                <div id="recap-timeline-container">
+                    <div id="recap-timeline"></div>
+                </div>
+                <button id="recap-close-btn" class="menu-btn">Kembali</button>
             </div>
-            <button id="recap-close-btn" class="menu-btn">Kembali</button>
         </div>
     </div>
 
@@ -172,48 +223,104 @@
     <!-- Main App Container -->
     <div id="app-container">
          <div id="confetti-container"></div>
-        <div class="game-container">
-            <h1 id="gameTitle">Tic Tac Toe</h1>
-            <div id="status" class="status">&nbsp;</div>
-            <div id="board" class="board">
-                <div class="cell" data-index="0"></div>
-                <div class="cell" data-index="1"></div>
-                <div class="cell" data-index="2"></div>
-                <div class="cell" data-index="3"></div>
-                <div class="cell" data-index="4"></div>
-                <div class="cell" data-index="5"></div>
-                <div class="cell" data-index="6"></div>
-                <div class="cell" data-index="7"></div>
-                <div class="cell" data-index="8"></div>
-            </div>
-            <div class="button-container">
-                <button id="nextRoundBtn">Babak Berikutnya >></button>
+         
+         <!-- In-Game Settings Modal -->
+        <div id="inGameSettingsModal" class="modal">
+            <div class="modal-content-wrapper">
+                <div class="modal-content">
+                    <h2 id="inGameSettingsTitle">Pengaturan Dalam Game</h2>
+                    
+                    <div class="setting-group">
+                        <label id="scoreboardAlignLabel">Posisi Papan Skor</label>
+                        <div class="option-group">
+                            <button class="option-btn" id="alignTopBtn">Atas</button>
+                            <button class="option-btn selected" id="alignCenterBtn">Tengah</button>
+                            <button class="option-btn" id="alignBottomBtn">Bawah</button>
+                        </div>
+                    </div>
+
+                    <div class="setting-group">
+                        <label id="drawIndicatorLabel">Penanda Seri (Mode Super)</label>
+                        <div class="option-group">
+                            <button class="option-btn selected" id="drawIndicatorOnBtn">Selalu Aktif</button>
+                            <button class="option-btn" id="drawIndicatorHoverBtn">Saat Hover</button>
+                            <button class="option-btn" id="drawIndicatorOffBtn">Nonaktif</button>
+                        </div>
+                    </div>
+
+                    <button id="inGameSettingsCloseBtn" class="menu-btn">Kembali</button>
+                </div>
             </div>
         </div>
         
-        <div id="info-panel">
-            <div id="scoreboard-container">
-                <h2 id="round-title">Babak</h2>
-                <div id="round-display">1 DARI 3</div>
-                <div class="player-info-container">
-                    <div id="player1Info" class="player-info">
-                        <div class="indicator"></div>
-                        <div class="player-details">
-                           <span id="player1Tag">Pemain 1</span>
-                           <span id="player1Name">Pemain 1</span>
-                        </div>
-                        <span id="player1Score" class="score">0</span>
-                    </div>
-                    <div id="player2Info" class="player-info">
-                        <div class="indicator"></div>
-                        <div class="player-details">
-                           <span id="player2Tag">Pemain 2</span>
-                           <span id="player2Name">Pemain 2</span>
-                        </div>
-                        <span id="player2Score" class="score">0</span>
+        <!-- Exit Confirmation Modal -->
+        <div id="exitConfirmationModal" class="modal">
+            <div class="modal-content-wrapper">
+                <div class="modal-content">
+                    <h2 id="exitConfirmTitle">Keluar dari Permainan?</h2>
+                    <p id="exitConfirmText">Tindakan ini akan mengakhiri pertandingan saat ini dan kembali ke menu utama.</p>
+                    <div class="option-group">
+                        <button class="option-btn" id="cancelExitBtn">Batal</button>
+                        <button class="option-btn" id="confirmExitBtn">Keluar</button>
                     </div>
                 </div>
-                <div id="round-result-status" class="round-result"></div>
+            </div>
+        </div>
+
+
+         <div id="main-content-wrapper">
+            <div class="in-game-controls">
+                <button id="exitGameBtn" class="ingame-btn" title="Keluar">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 21h-4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="9 17 4 12 9 7"/><line x1="4" y1="12" x2="16" y2="12"/></svg>
+                </button>
+                <button id="inGameSettingsBtn" class="ingame-btn" title="Pengaturan">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                </button>
+            </div>
+            <div class="game-container">
+                <h1 id="gameTitle">Tic Tac Toe</h1>
+                <div id="status" class="status">&nbsp;</div>
+                
+                <div id="board" class="board">
+                    <!-- Normal 3x3 cells -->
+                    <div class="cell" data-index="0"></div><div class="cell" data-index="1"></div><div class="cell" data-index="2"></div>
+                    <div class="cell" data-index="3"></div><div class="cell" data-index="4"></div><div class="cell" data-index="5"></div>
+                    <div class="cell" data-index="6"></div><div class="cell" data-index="7"></div><div class="cell" data-index="8"></div>
+                </div>
+
+                <div id="superBoard" class="super-board">
+                    <!-- Auto-generated by JavaScript -->
+                </div>
+
+                <div class="button-container">
+                    <button id="nextRoundBtn" style="display: none;">Babak Berikutnya >></button>
+                </div>
+            </div>
+            
+            <div id="info-panel">
+                <div id="scoreboard-container">
+                    <h2 id="round-title">Babak</h2>
+                    <div id="round-display">1 DARI 3</div>
+                    <div class="player-info-container">
+                        <div id="player1Info" class="player-info">
+                            <div class="indicator"></div>
+                            <div class="player-details">
+                               <span id="player1Tag">Pemain 1</span>
+                               <span id="player1Name">Pemain 1</span>
+                            </div>
+                            <span id="player1Score" class="score">0</span>
+                        </div>
+                        <div id="player2Info" class="player-info">
+                            <div class="indicator"></div>
+                            <div class="player-details">
+                               <span id="player2Tag">Pemain 2</span>
+                               <span id="player2Name">Pemain 2</span>
+                            </div>
+                            <span id="player2Score" class="score">0</span>
+                        </div>
+                    </div>
+                    <div id="round-result-status" class="round-result"></div>
+                </div>
             </div>
         </div>
     </div>
