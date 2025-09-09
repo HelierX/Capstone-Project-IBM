@@ -1,6 +1,7 @@
 // DOM Elements
 const statusDisplay = document.querySelector('#status');
 const board = document.querySelector('#board');
+const superBoard = document.querySelector('#superBoard');
 const buttonContainer = document.querySelector('.button-container');
 const nextRoundBtn = document.querySelector('#nextRoundBtn');
 const cells = document.querySelectorAll('.cell');
@@ -41,17 +42,25 @@ const recapH2H = document.querySelector('#recap-h2h-score');
 const recapHistoryTitle = document.querySelector('#recapHistoryTitle');
 const recapTimeline = document.querySelector('#recap-timeline');
 const recapCloseBtn = document.querySelector('#recap-close-btn');
+const recapCloseBtnX = document.querySelector('#recap-close-btn-x');
+
 
 // Menu and Settings Elements
 const newGameBtn = document.querySelector('#newGameBtn');
+const newGameBtnText = document.querySelector('#newGameBtnText');
 const howToPlayOpenBtn = document.querySelector('#howToPlayOpenBtn');
 const rulesOpenBtn = document.querySelector('#rulesOpenBtn');
 const rulesCloseBtn = document.querySelector('#rules-close-btn');
+const rulesCloseBtnX = document.querySelector('#rules-close-btn-x');
+const settingsCloseBtnX = document.querySelector('#settings-close-btn-x');
+const modeNormalBtn = document.getElementById('modeNormalBtn');
+const modeSuperBtn = document.getElementById('modeSuperBtn');
 const p1NameInput = document.querySelector('#p1NameInput');
 const p2NameInput = document.querySelector('#p2NameInput');
 const p1SymbolPicker = document.querySelector('#p1-symbol-picker');
 const p2SymbolPicker = document.querySelector('#p2-symbol-picker');
 const settingsError = document.querySelector('#settings-error');
+const roundSettingsContainer = document.getElementById('round-settings-container');
 const chooseP1Start = document.querySelector('#chooseP1Start');
 const chooseP2Start = document.querySelector('#chooseP2Start');
 const roundSlider = document.querySelector('#roundSlider');
@@ -64,22 +73,42 @@ const colorPickerContainer = document.querySelector('#color-picker-container');
 const p1ColorOptions = document.querySelector('#p1-color-options');
 const p2ColorOptions = document.querySelector('#p2-color-options');
 const startGameBtn = document.querySelector('#startGameBtn');
+const tieBreakerSetting = document.querySelector('.tie-breaker-setting');
+const tieBreakerCheck = document.getElementById('tieBreakerCheck');
 
 // Rules Modal Tabs
 const tabLinks = document.querySelectorAll('.tab-link');
 const tabContents = document.querySelectorAll('.tab-content');
-const howToPlayTabBtn = document.getElementById('howToPlayTabBtn');
-const rulesTabBtn = document.getElementById('rulesTabBtn');
+const subTabLinks = document.querySelectorAll('.sub-tab-link');
+const subTabContents = document.querySelectorAll('.sub-tab-content');
 const howToPlayTitle = document.getElementById('howToPlayTitle');
 const rulesTitle = document.getElementById('rulesTitle');
-const howToPlayContent = document.getElementById('howToPlayContent');
-const rulesContent = document.querySelector('#rulesContent');
+const howToPlayNormalContent = document.getElementById('howToPlayNormal');
+const howToPlaySuperContent = document.getElementById('howToPlaySuper');
+const rulesContent = document.getElementById('rulesContent');
+const howToPlayTabBtn = document.getElementById('howToPlayTabBtn');
+const rulesTabBtn = document.getElementById('rulesTabBtn');
+
+// In-Game Controls & Settings
+const inGameSettingsModal = document.querySelector('#inGameSettingsModal');
+const exitGameBtn = document.querySelector('#exitGameBtn');
+const inGameSettingsBtn = document.querySelector('#inGameSettingsBtn');
+const inGameSettingsCloseBtn = document.querySelector('#inGameSettingsCloseBtn');
+const alignTopBtn = document.querySelector('#alignTopBtn');
+const alignCenterBtn = document.querySelector('#alignCenterBtn');
+const alignBottomBtn = document.querySelector('#alignBottomBtn');
+const drawIndicatorOnBtn = document.querySelector('#drawIndicatorOnBtn');
+const drawIndicatorHoverBtn = document.querySelector('#drawIndicatorHoverBtn');
+const drawIndicatorOffBtn = document.querySelector('#drawIndicatorOffBtn');
+const mainContentWrapper = document.querySelector('#main-content-wrapper');
+const exitConfirmationModal = document.querySelector('#exitConfirmationModal');
+const cancelExitBtn = document.querySelector('#cancelExitBtn');
+const confirmExitBtn = document.querySelector('#confirmExitBtn');
 
 
 // Game State
 let gameActive = false;
 let currentPlayer = 'X';
-let gameState = ['', '', '', '', '', '', '', '', ''];
 let currentLanguage = 'id';
 let playerNames = { p1: "Pemain 1", p2: "Pemain 2" };
 let playerSymbols = { p1: 'X', p2: 'O' };
@@ -91,9 +120,16 @@ let gameSettings = {
     alternateTurns: true,
     alternateOnRematch: true,
     useColors: false,
-    p1Color: '#4CAF50',
-    p2Color: '#a77dff',
-    match1Round1Starter: 'p1'
+    p1Color: '#D32F2F', 
+    p2Color: '#1976D2', 
+    match1Round1Starter: 'p1',
+    useTieBreaker: false,
+    scoreboardAlign: 'center',
+    drawIndicatorMode: 'on'
+};
+let settingsCache = {
+    normal: { totalRounds: 3 },
+    super: { totalRounds: 2, useTieBreaker: false }
 };
 let currentRound = 1;
 let roundStarter = 'X';
@@ -101,6 +137,13 @@ let lastRoundResult = { winner: null, isDraw: false };
 let matchHistories = [];
 let currentRecapMatch = 1;
 let recapTimeoutId = null;
+
+// Mode-specific states
+let currentGameMode = 'normal';
+let gameState = ['', '', '', '', '', '', '', '', '']; // For normal mode
+let smallBoardStates = []; // For super mode
+let mainBoardState = []; // For super mode
+let nextActiveBoardIndex = null; // For super mode
 
 const winningConditions = [
     [0, 1, 2], [3, 4, 5], [6, 7, 8],
@@ -110,10 +153,12 @@ const winningConditions = [
 
 const SVG_RETRY = `<svg class="retry-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 12C2 7.28595 2 4.92893 3.46447 3.46447C4.92893 2 7.28595 2 12 2C16.714 2 19.0711 2 20.5355 3.46447C22 4.92893 22 7.28595 22 12C22 16.714 22 19.0711 20.5355 20.5355C19.0711 22 16.714 22 12 22C7.28595 22 4.92893 22 3.46447 20.5355C2 19.0711 2 16.714 2 12Z" stroke="currentColor" stroke-width="2"/><path d="M15.9922 12.3333C15.9922 14.5424 14.2043 16.3333 11.9922 16.3333C9.78002 16.3333 7.99219 14.5424 7.99219 12.3333C7.99219 10.1242 9.78002 8.33331 11.9922 8.33331C13.4337 8.33331 14.6934 9.07137 15.4422 10.1666" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M15.4414 7.25V10.1667H12.5248" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 const RAINBOW_COLORS = ['#D32F2F', '#F57C00', '#E6A100', '#388E3C', '#1976D2', '#7B1FA2', '#C2185B'];
+const SVG_O_OVERLAY = `<svg class="o-char-svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" /></svg>`;
 
 const translations = {
     id: {
-        gameTitle: "Tic Tac Toe",
+        gameTitleNormal: "Tic Tac Toe",
+        gameTitleSuper: "Super Tic Tac Toe",
         playerXTurn: (name, symbol) => `Giliran ${name} (${symbol})`,
         roundWon: (name) => `${name} Memenangkan Babak Ini!`,
         roundDraw: "Babak Ini Seri!",
@@ -125,6 +170,7 @@ const translations = {
         howToPlayBtnLabel: "Cara Bermain",
         rulesBtnLabel: "Aturan",
         settingsModalTitle: "Pengaturan Permainan",
+        gameModeLabel: "Mode Permainan",
         p1NamePlaceholder: "Nama Pemain 1",
         p2NamePlaceholder: "Nama Pemain 2",
         player1Tag: "Pemain 1",
@@ -136,13 +182,13 @@ const translations = {
         useColorsLabel: "Gunakan Warna Pemain",
         p1ColorLabel: "Warna Pemain 1",
         p2ColorLabel: "Warna Pemain 2",
-        startGameBtn: "Mulai Bermain!",
+        startGameBtn: "Mulai Permainan!",
         roundTitle: "Babak",
         roundStatus: (round, total) => `${round} DARI ${total}`,
         matchWinner: (name) => `${name} MEMENANGKAN PERMAINAN!`,
         matchDraw: "PERMAINAN BERAKHIR SERI!",
         roundResultWinner: (name, symbol) => `${name} (${symbol})<br>+1 Poin`,
-        roundResultDraw: "Kedua Pemain<br>+½ Poin",
+        roundResultDraw: `Kedua Pemain<br>+½ Poin`,
         recapTitle: "Hasil Akhir",
         recapHistoryTitle: "Riwayat Babak",
         recapCloseBtn: "Kembali",
@@ -153,34 +199,38 @@ const translations = {
         rulesTitle: "Aturan Permainan",
         howToPlayTab: "Cara Bermain",
         rulesTab: "Aturan",
-        howToPlayContent: `
-            <h3>Tujuan Permainan</h3>
-            <p>Jadilah pemain pertama yang berhasil membuat garis horizontal, vertikal, atau diagonal dengan tiga simbol (X atau O) milikmu.</p>
-            <h3>Cara Bermain</h3>
-            <ul>
-                <li>Permainan dimainkan di papan 3x3.</li>
-                <li>Pemain 1 dan Pemain 2 memilih simbol mereka (X atau O).</li>
-                <li>Para pemain bergiliran menempatkan simbol mereka di kotak yang kosong.</li>
-                <li>Pemain pertama yang mendapatkan 3 simbol berturut-turut adalah pemenang babak tersebut.</li>
-            </ul>
-        `,
-        rulesContent: `
-            <h3>Sistem Skor</h3>
-            <p>Permainan terdiri dari beberapa babak (dapat diatur di pengaturan). Pemenang babak mendapatkan 1 poin. Jika papan penuh dan tidak ada pemenang, babak berakhir seri dan kedua pemain mendapatkan ½ poin. Pemain dengan skor tertinggi di akhir semua babak memenangkan pertandingan!</p>
-            <h3>Aturan Nama</h3>
-            <ul>
-                <li>Nama pemain tidak boleh sama.</li>
-                <li>Nama tidak boleh mengandung kata "seri", "tie", atau "draw" untuk menghindari kebingungan pada papan skor.</li>
-                <li>Jika nama tidak diisi, akan otomatis menjadi "Pemain 1" dan "Pemain 2".</li>
-            </ul>
-        `,
+        tieBreakerLabel: "Gunakan Tie-Breaker Saat Seri",
+        alternateTurnsTooltip: "Jika aktif, pemain yang memulai babak akan bergantian setiap babak baru.",
+        alternateRematchTooltip: "Jika aktif, pemain yang memulai pertandingan pertama akan bergantian di pertandingan ulang berikutnya.",
+        tieBreakerTooltip: "Khusus Mode Super: Jika babak berakhir seri, pemenang ditentukan dari jumlah kotak yang dimenangkan.",
+        howToPlayNormalContent: `<h3>Tujuan</h3><p>Menjadi pemain pertama yang membuat garis horizontal, vertikal, atau diagonal dengan tiga simbol.</p><h3>Cara Bermain</h3><ul><li>Permainan dimainkan di papan 3x3.</li><li>Pemain bergiliran menempatkan simbol mereka di kotak yang kosong.</li><li>Pemain pertama yang mendapatkan 3 simbol berturut-turut adalah pemenang babak tersebut.</li></ul>`,
+        howToPlaySuperContent: `<h3>Konsep</h3><p>Permainan ini terdiri dari 9 papan Tic Tac Toe kecil dalam satu papan besar. Untuk memenangkan satu babak, Anda harus memenangkan 3 papan kecil dalam satu baris (horizontal, vertikal, atau diagonal) di papan besar.</p><h3>Aturan Main</h3><ul><li>Langkah pertama bebas di papan mana saja.</li><li>Langkah Anda di sebuah kotak kecil akan <b>menentukan di papan kecil mana lawan harus bermain selanjutnya.</b> Contoh: jika Anda bermain di kotak kanan atas pada papan kecil, lawan Anda harus bermain di papan kecil yang berada di posisi kanan atas.</li><li>Jika papan tujuan sudah dimenangkan atau seri, lawan boleh bermain di papan kecil mana pun yang masih tersedia.</li></ul>`,
+        rulesContent: `<h3>Sistem Skor</h3><p>Permainan terdiri dari beberapa babak (dapat diatur). Pemenang babak mendapatkan 1 poin. Jika papan penuh dan tidak ada pemenang, babak berakhir seri dan kedua pemain mendapatkan ½ poin. Pemain dengan skor tertinggi di akhir semua babak memenangkan pertandingan!</p><h3>Aturan Tie-Breaker (Mode Super)</h3><p>Jika opsi ini aktif dan babak berakhir seri (tidak ada 3 baris di papan besar), pemenang akan ditentukan berdasarkan siapa yang memenangkan lebih banyak papan kecil. Jika jumlah kemenangan papan kecil juga sama, barulah babak dinyatakan benar-benar seri.</p><h3>Aturan Nama</h3><ul><li>Nama pemain tidak boleh sama.</li><li>Nama tidak boleh mengandung kata "seri", "tie", atau "draw" untuk menghindari kebingungan.</li></ul>`,
         rulesCloseBtn: "Mengerti",
-        errorForbiddenName: "Nama tidak disarankan. Cek Aturan untuk detail lebih lanjut.",
+        errorForbiddenName: "Nama tidak disarankan. Cek Aturan.",
         errorSameName: "Nama pemain tidak boleh sama.",
-        flag: "https://flagcdn.com/id.svg"
+        flag: "https://flagcdn.com/id.svg",
+        inGameSettingsTitle: "Pengaturan Dalam Game",
+        scoreboardAlignLabel: "Posisi Papan Skor",
+        alignTop: "Atas",
+        alignCenter: "Tengah",
+        alignBottom: "Bawah",
+        drawIndicatorLabel: "Penanda Seri (Mode Super)",
+        drawIndicatorOn: "Selalu Aktif",
+        drawIndicatorHover: "Saat Hover",
+        drawIndicatorOff: "Nonaktif",
+        inGameSettingsClose: "Kembali",
+        exitGameTitle: "Keluar",
+        inGameSettingsTitleAttr: "Pengaturan",
+        drawChar: 'S',
+        exitConfirmTitle: 'Keluar dari Permainan?',
+        exitConfirmText: 'Tindakan ini akan mengakhiri pertandingan saat ini dan kembali ke menu utama.',
+        cancel: 'Batal',
+        exit: 'Keluar'
     },
     en: {
-        gameTitle: "Tic Tac Toe",
+        gameTitleNormal: "Tic Tac Toe",
+        gameTitleSuper: "Super Tic Tac Toe",
         playerXTurn: (name, symbol) => `${name}'s Turn (${symbol})`,
         roundWon: (name) => `${name} Wins This Round!`,
         roundDraw: "This Round is a Draw!",
@@ -192,6 +242,7 @@ const translations = {
         howToPlayBtnLabel: "How to Play",
         rulesBtnLabel: "Rules",
         settingsModalTitle: "Game Settings",
+        gameModeLabel: "Game Mode",
         p1NamePlaceholder: "Player 1 Name",
         p2NamePlaceholder: "Player 2 Name",
         player1Tag: "Player 1",
@@ -209,7 +260,7 @@ const translations = {
         matchWinner: (name) => `${name} WINS THE GAME!`,
         matchDraw: "THE GAME IS A DRAW!",
         roundResultWinner: (name, symbol) => `${name} (${symbol})<br>+1 Point`,
-        roundResultDraw: "Both Players<br>+½ Point",
+        roundResultDraw: `Both Players<br>+½ Point`,
         recapTitle: "Final Result",
         recapHistoryTitle: "Round History",
         recapCloseBtn: "Back",
@@ -220,31 +271,34 @@ const translations = {
         rulesTitle: "Game Rules",
         howToPlayTab: "How to Play",
         rulesTab: "Rules",
-        howToPlayContent: `
-            <h3>Objective</h3>
-            <p>Be the first player to form a horizontal, vertical, or diagonal line of three of your symbols (X or O).</p>
-            <h3>Gameplay</h3>
-            <ul>
-                <li>The game is played on a 3x3 grid.</li>
-                <li>Player 1 and Player 2 choose their symbols (X or O).</li>
-                <li>Players take turns placing their symbols in empty squares.</li>
-                <li>The first player to get 3 of their symbols in a row is the winner of the round.</li>
-            </ul>
-        `,
-        rulesContent: `
-            <h3>Scoring System</h3>
-            <p>The game consists of multiple rounds (configurable in settings). The winner of a round gets 1 point. If the board is full and there's no winner, the round is a draw, and both players get ½ a point. The player with the highest score at the end of all rounds wins the match!</p>
-            <h3>Naming Rules</h3>
-            <ul>
-                <li>Player names cannot be the same.</li>
-                <li>Names cannot contain the words "seri", "tie", or "draw" to avoid confusion on the scoreboard.</li>
-                <li>If names are left blank, they will default to "Player 1" and "Player 2".</li>
-            </ul>
-        `,
+        tieBreakerLabel: "Use Tie-Breaker on Draw",
+        alternateTurnsTooltip: "If active, the starting player will alternate each new round.",
+        alternateRematchTooltip: "If active, the player who started the first match will alternate in the next rematch.",
+        tieBreakerTooltip: "Super Mode Only: If a round ends in a draw, the winner is decided by who won the most small boards.",
+        howToPlayNormalContent: `<h3>Objective</h3><p>Be the first player to form a horizontal, vertical, or diagonal line of three of your symbols.</p><h3>Gameplay</h3><ul><li>The game is played on a 3x3 grid.</li><li>Players take turns placing their symbols in empty squares.</li><li>The first player to get 3 of their symbols in a row is the winner of the round.</li></ul>`,
+        howToPlaySuperContent: `<h3>Concept</h3><p>This game consists of 9 small Tic Tac Toe boards within one large board. To win a round, you must win 3 small boards in a row (horizontally, vertically, or diagonally) on the main board.</p><h3>Gameplay</h3><ul><li>The first move is a free choice on any board.</li><li>Your move in a small square <b>determines which small board the opponent must play in next.</b> For example, if you play in the top-right square of a small board, your opponent must then play in the top-right small board.</li><li>If the target board is already won or drawn, the opponent is free to play in any available small board.</li></ul>`,
+        rulesContent: `<h3>Scoring System</h3><p>The game consists of multiple rounds (configurable). The winner of a round gets 1 point. If the board is full and there's no winner, the round is a draw, and both players get ½ a point. The player with the highest score at the end of all rounds wins the match!</p><h3>Tie-Breaker Rule (Super Mode)</h3><p>If this option is active and a round ends in a draw (no 3-in-a-row on the main board), the winner will be decided by who won the most small boards. If the number of won small boards is also equal, then the round is a true draw.</p><h3>Naming Rules</h3><ul><li>Player names cannot be the same.</li><li>Names cannot contain the words "seri", "tie", or "draw".</li></ul>`,
         rulesCloseBtn: "Got It",
-        errorForbiddenName: "Name not recommended. See Rules for details.",
+        errorForbiddenName: "Name not recommended. See Rules.",
         errorSameName: "Player names cannot be the same.",
-        flag: "https://flagcdn.com/us.svg"
+        flag: "https://flagcdn.com/us.svg",
+        inGameSettingsTitle: "In-Game Settings",
+        scoreboardAlignLabel: "Scoreboard Position",
+        alignTop: "Top",
+        alignCenter: "Center",
+        alignBottom: "Bottom",
+        drawIndicatorLabel: "Draw Marker (Super Mode)",
+        drawIndicatorOn: "Always On",
+        drawIndicatorHover: "On Hover",
+        drawIndicatorOff: "Off",
+        inGameSettingsClose: "Back",
+        exitGameTitle: "Exit",
+        inGameSettingsTitleAttr: "Settings",
+        drawChar: 'T',
+        exitConfirmTitle: 'Exit Game?',
+        exitConfirmText: 'This will end the current match and return you to the main menu.',
+        cancel: 'Cancel',
+        exit: 'Exit'
     }
 };
 
@@ -253,26 +307,30 @@ function setLanguage(lang) {
     const t = translations[lang];
     
     const elementsToTranslate = {
-        mainMenuTitle: t.gameTitle, 
-        newGameBtn: t.newGameBtn,
-        settingsModalTitle: t.settingsModalTitle, 
-        firstTurnLabel: t.firstTurnLabel,
-        alternateTurnsLabel: t.alternateTurnsLabel, 
-        startGameBtn: t.startGameBtn,
-        recapTitle: t.recapTitle, 
-        recapHistoryTitle: t.recapHistoryTitle,
-        'recap-close-btn': t.recapCloseBtn, 
-        gameTitle: t.gameTitle, 
-        'round-title': t.roundTitle,
-        alternateRematchLabel: t.alternateRematchLabel, 
+        mainMenuTitle: t.gameTitleNormal, newGameBtnText: t.newGameBtn,
+        settingsModalTitle: t.settingsModalTitle, firstTurnLabel: t.firstTurnLabel,
+        startGameBtnText: t.startGameBtn,
+        recapTitle: t.recapTitle, recapHistoryTitle: t.recapHistoryTitle,
+        'recap-close-btn': t.recapCloseBtn, 'round-title': t.roundTitle, 
+        p1ColorLabel: t.p1ColorLabel, p2ColorLabel: t.p2ColorLabel, 
+        'rules-close-btn': t.rulesCloseBtn, gameModeLabel: t.gameModeLabel, 
+        howToPlayTitle: t.howToPlayTitle, rulesTitle: t.rulesTitle,
+        howToPlayTabBtn: t.howToPlayTab, rulesTabBtn: t.rulesTab,
         useColorsLabel: t.useColorsLabel,
-        p1ColorLabel: t.p1ColorLabel, 
-        p2ColorLabel: t.p2ColorLabel,
-        'rules-close-btn': t.rulesCloseBtn,
-        howToPlayTabBtn: t.howToPlayTab, 
-        rulesTabBtn: t.rulesTab,
-        howToPlayTitle: t.howToPlayTitle, 
-        rulesTitle: t.rulesTitle
+        inGameSettingsTitle: t.inGameSettingsTitle,
+        scoreboardAlignLabel: t.scoreboardAlignLabel,
+        alignTopBtn: t.alignTop,
+        alignCenterBtn: t.alignCenter,
+        alignBottomBtn: t.alignBottom,
+        drawIndicatorLabel: t.drawIndicatorLabel,
+        drawIndicatorOnBtn: t.drawIndicatorOn,
+        drawIndicatorHoverBtn: t.drawIndicatorHover,
+        drawIndicatorOffBtn: t.drawIndicatorOff,
+        inGameSettingsCloseBtn: t.inGameSettingsClose,
+        exitConfirmTitle: t.exitConfirmTitle,
+        exitConfirmText: t.exitConfirmText,
+        cancelExitBtn: t.cancel,
+        confirmExitBtn: t.exit
     };
 
     for (const id in elementsToTranslate) {
@@ -280,36 +338,34 @@ function setLanguage(lang) {
         if(el) el.textContent = elementsToTranslate[id];
     }
     
-    rulesContent.innerHTML = t.rulesContent;
-    howToPlayContent.innerHTML = t.howToPlayContent;
-    howToPlayOpenBtn.setAttribute('aria-label', t.howToPlayBtnLabel);
-    howToPlayOpenBtn.setAttribute('title', t.howToPlayBtnLabel);
-    rulesOpenBtn.setAttribute('aria-label', t.rulesBtnLabel);
-    rulesOpenBtn.setAttribute('title', t.rulesBtnLabel);
-    
-    document.querySelector('.language-option[data-lang="en"]').innerHTML = `<img src="https://flagcdn.com/us.svg" alt="Bendera Amerika"> English (US)`;
+    document.querySelector('#alternateTurnsLabel span').textContent = t.alternateTurnsLabel;
+    document.querySelector('#alternateRematchLabel span').textContent = t.alternateRematchLabel;
+    document.querySelector('#tieBreakerLabel span').textContent = t.tieBreakerLabel;
 
+    document.querySelector('[data-tooltip-id="alternateTurnsTooltip"]').setAttribute('data-tooltip', t.alternateTurnsTooltip);
+    document.querySelector('[data-tooltip-id="alternateRematchTooltip"]').setAttribute('data-tooltip', t.alternateRematchTooltip);
+    document.querySelector('[data-tooltip-id="tieBreakerTooltip"]').setAttribute('data-tooltip', t.tieBreakerTooltip);
+
+    howToPlayOpenBtn.setAttribute('title', t.howToPlayBtnLabel);
+    rulesOpenBtn.setAttribute('title', t.rulesBtnLabel);
+    exitGameBtn.setAttribute('title', t.exitGameTitle);
+    inGameSettingsBtn.setAttribute('title', t.inGameSettingsTitleAttr);
     p1NameInput.placeholder = t.p1NamePlaceholder;
     p2NameInput.placeholder = t.p2NamePlaceholder;
     chooseP1Start.textContent = t.player1Tag;
     chooseP2Start.textContent = t.player2Tag;
-    roundLabelText.textContent = t.roundLabelText;
+    
+    document.querySelector('#roundLabelText').textContent = t.roundLabelText;
     document.querySelector('#currentFlag').src = t.flag;
 
     if (appContainer.classList.contains('active')) {
+        gameTitle.textContent = currentGameMode === 'normal' ? t.gameTitleNormal : t.gameTitleSuper;
         updatePlayerTags();
-        if (!gameActive && (lastRoundResult.winner || lastRoundResult.isDraw)) {
-             if (lastRoundResult.isDraw) {
-                statusDisplay.textContent = t.roundDraw;
-                roundResultStatus.innerHTML = t.roundResultDraw;
-             } else {
-                const winnerName = lastRoundResult.winner === playerSymbols.p1 ? playerNames.p1 : playerNames.p2;
-                statusDisplay.textContent = t.roundWon(winnerName);
-                roundResultStatus.innerHTML = t.roundResultWinner(winnerName, lastRoundResult.winner);
-             }
-        } else if (gameActive) {
-             const currentPlayerName = currentPlayer === playerSymbols.p1 ? playerNames.p1 : playerNames.p2;
-             statusDisplay.textContent = t.playerXTurn(currentPlayerName, currentPlayer);
+        if (!gameActive) {
+            updateStatusForEndState();
+        } else {
+            const currentPlayerName = currentPlayer === playerSymbols.p1 ? playerNames.p1 : playerNames.p2;
+            statusDisplay.textContent = t.playerXTurn(currentPlayerName, currentPlayer);
         }
         roundDisplay.textContent = t.roundStatus(currentRound, gameSettings.totalRounds);
         updateEndGameButtons();
@@ -317,109 +373,236 @@ function setLanguage(lang) {
             populateRecapModal(currentRecapMatch);
         }
     }
+    
+    // PERBAIKAN: Perbarui teks seri jika papan sudah ditampilkan
+    if (superBoard.style.display === 'grid') {
+        updateDrawMarkersLanguage();
+    }
 }
 
-function handleCellPlayed(clickedCell, clickedCellIndex) {
-    gameState[clickedCellIndex] = currentPlayer;
-    if (currentPlayer === 'O') {
+function updateStatusForEndState() {
+    const t = translations[currentLanguage];
+    if (lastRoundResult.isDraw) {
+        statusDisplay.textContent = t.roundDraw;
+        roundResultStatus.innerHTML = t.roundResultDraw;
+    } else if (lastRoundResult.winner) {
+        const winnerName = lastRoundResult.winner === playerSymbols.p1 ? playerNames.p1 : playerNames.p2;
+        statusDisplay.textContent = t.roundWon(winnerName);
+        roundResultStatus.innerHTML = t.roundResultWinner(winnerName, lastRoundResult.winner);
+    }
+}
+
+function checkWinner(boardState) {
+    for (let i = 0; i < winningConditions.length; i++) {
+        const [a, b, c] = winningConditions[i];
+        if (boardState[a] && boardState[a] !== 'D' && boardState[a] === boardState[b] && boardState[a] === boardState[c]) {
+            return { winner: boardState[a], line: winningConditions[i] };
+        }
+    }
+    if (!boardState.includes('')) return { winner: 'D', line: [] }; // Draw
+    return { winner: null, line: [] }; // No winner yet
+}
+
+function handleCellPlayed(clickedCell, symbol) {
+    if (symbol === 'O') {
         clickedCell.innerHTML = `<svg class="o-char-svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" /></svg>`;
     } else {
-        clickedCell.innerHTML = `<span class="x-char">X</span>`;
+        clickedCell.innerHTML = `<span class="x-char">${symbol}</span>`;
     }
     clickedCell.classList.add('occupied');
 }
 
 function handlePlayerChange() {
-    currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+    currentPlayer = currentPlayer === playerSymbols.p1 ? playerSymbols.p2 : playerSymbols.p1;
     player1Info.classList.toggle('active', currentPlayer === playerSymbols.p1);
     player2Info.classList.toggle('active', currentPlayer === playerSymbols.p2);
+    document.body.classList.toggle('p2-turn', currentPlayer === playerSymbols.p2);
     setLanguage(currentLanguage);
 }
 
-function handleResultValidation() {
-    let roundWon = false;
-    let winningCells = [];
-    for (let i = 0; i < winningConditions.length; i++) {
-        const winCondition = winningConditions[i];
-        let a = gameState[winCondition[0]];
-        let b = gameState[winCondition[1]];
-        let c = gameState[winCondition[2]];
-        if (a === '' || b === '' || c === '') continue;
-        if (a === b && b === c) {
-            roundWon = true;
-            winningCells = winCondition;
-            break;
+function handleEndRound(winner) {
+    gameActive = false;
+    
+    if (winner === 'D' && currentGameMode === 'super' && gameSettings.useTieBreaker) {
+        const p1Boards = mainBoardState.filter(s => s === playerSymbols.p1).length;
+        const p2Boards = mainBoardState.filter(s => s === playerSymbols.p2).length;
+
+        if (p1Boards > p2Boards) {
+            winner = playerSymbols.p1;
+        } else if (p2Boards > p1Boards) {
+            winner = playerSymbols.p2;
         }
     }
 
-    if (roundWon) {
-        gameActive = false;
-        scores[currentPlayer]++;
-        updateScoreboard();
-        lastRoundResult = { winner: currentPlayer, isDraw: false };
-        matchHistories[matchCount - 1].rounds.push({ round: currentRound, winner: currentPlayer });
-        statusDisplay.classList.add('win-animation');
-        const winnerScoreElement = currentPlayer === playerSymbols.p1 ? player1Score : player2Score;
-        winnerScoreElement.classList.add('win-animation');
-
-        winningCells.forEach(index => {
-            const cell = cells[index];
-            cell.classList.add('win');
-            if (gameSettings.useColors) {
-                 cell.classList.add(currentPlayer === playerSymbols.p1 ? 'p1-win' : 'p2-win');
-            }
-        });
-        setLanguage(currentLanguage);
-        checkMatchOver();
-        return;
-    }
-
-    if (!gameState.includes("")) {
-        gameActive = false;
-        scores.X += 0.5;
-        scores.O += 0.5;
-        updateScoreboard();
+    if (winner === 'D') {
+        scores[playerSymbols.p1] += 0.5;
+        scores[playerSymbols.p2] += 0.5;
         lastRoundResult = { winner: null, isDraw: true };
         matchHistories[matchCount - 1].rounds.push({ round: currentRound, winner: null });
-        setLanguage(currentLanguage);
-        checkMatchOver();
-        return;
+    } else {
+        scores[winner]++;
+        lastRoundResult = { winner: winner, isDraw: false };
+        matchHistories[matchCount - 1].rounds.push({ round: currentRound, winner: winner });
+        
+        statusDisplay.classList.add('win-animation');
+        const winnerScoreElement = winner === playerSymbols.p1 ? player1Score : player2Score;
+        winnerScoreElement.classList.add('win-animation');
     }
 
+    updateScoreboard();
+    updateStatusForEndState();
+    checkMatchOver();
+}
+
+function handleNormalResultValidation() {
+    const result = checkWinner(gameState);
+    if(result.winner) {
+        if(result.winner !== 'D') {
+             result.line.forEach(index => {
+                const cell = cells[index];
+                cell.classList.add('win');
+                if (gameSettings.useColors) {
+                    cell.classList.add(currentPlayer === playerSymbols.p1 ? 'p1-win' : 'p2-win');
+                }
+            });
+        }
+        handleEndRound(result.winner === 'D' ? 'D' : currentPlayer);
+        return;
+    }
     handlePlayerChange();
 }
 
+function updateDrawMarkersLanguage() {
+    const t = translations[currentLanguage];
+    document.querySelectorAll('.small-board.board-draw .small-board-overlay .x-char').forEach(el => {
+        el.textContent = t.drawChar;
+    });
+}
+
+function handleSuperResultValidation(clickedCell) {
+    const smallBoardEl = clickedCell.closest('.small-board');
+    const smallBoardIndex = parseInt(smallBoardEl.dataset.mainIndex);
+    const cellIndex = parseInt(clickedCell.dataset.index);
+
+    smallBoardStates[smallBoardIndex][cellIndex] = currentPlayer;
+    
+    const smallBoardResult = checkWinner(smallBoardStates[smallBoardIndex]);
+    if (smallBoardResult.winner) {
+        mainBoardState[smallBoardIndex] = smallBoardResult.winner;
+        const overlay = smallBoardEl.querySelector('.small-board-overlay');
+        
+        if (smallBoardResult.winner === 'O') {
+            overlay.innerHTML = SVG_O_OVERLAY;
+        } else {
+             const t = translations[currentLanguage];
+             const text = smallBoardResult.winner === 'D' ? t.drawChar : smallBoardResult.winner;
+             overlay.innerHTML = `<span class="x-char">${text}</span>`;
+        }
+
+        smallBoardEl.classList.add('board-won');
+        if (smallBoardResult.winner !== 'D') {
+             if (gameSettings.useColors) { 
+                smallBoardEl.classList.add(`board-won-${smallBoardResult.winner}`);
+            }
+        } else {
+            smallBoardEl.classList.add('board-draw');
+        }
+        
+        const mainBoardResult = checkWinner(mainBoardState);
+        if(mainBoardResult.winner) {
+            handleEndRound(mainBoardResult.winner);
+            return;
+        }
+    }
+    
+    nextActiveBoardIndex = cellIndex;
+    if(mainBoardState[nextActiveBoardIndex] !== '') {
+        nextActiveBoardIndex = null;
+    }
+    handlePlayerChange();
+    updateSuperBoardUI();
+}
+
 function handleCellClick(e) {
-    const clickedCell = e.target.closest('.cell');
-    if (!clickedCell) return;
-    const clickedCellIndex = parseInt(clickedCell.getAttribute('data-index'));
-    if (gameState[clickedCellIndex] !== '' || !gameActive) return;
-    handleCellPlayed(clickedCell, clickedCellIndex);
-    handleResultValidation();
+    if (!gameActive) return;
+
+    if (currentGameMode === 'normal') {
+        const clickedCell = e.target.closest('.cell:not(.super-cell)');
+        if (!clickedCell || gameState[parseInt(clickedCell.getAttribute('data-index'))] !== '') return;
+        
+        gameState[parseInt(clickedCell.getAttribute('data-index'))] = currentPlayer;
+        handleCellPlayed(clickedCell, currentPlayer);
+        handleNormalResultValidation();
+
+    } else { // Super Mode Logic
+        const clickedCell = e.target.closest('.super-cell');
+        if (!clickedCell) return;
+
+        const smallBoardEl = clickedCell.closest('.small-board');
+        const smallBoardIndex = parseInt(smallBoardEl.dataset.mainIndex);
+        const cellIndex = parseInt(clickedCell.dataset.index);
+
+        const isMoveAllowed = (nextActiveBoardIndex === null || nextActiveBoardIndex === smallBoardIndex);
+        if (!isMoveAllowed || mainBoardState[smallBoardIndex] !== '' || smallBoardStates[smallBoardIndex][cellIndex] !== '') {
+            return;
+        }
+        
+        handleCellPlayed(clickedCell, currentPlayer);
+        handleSuperResultValidation(clickedCell);
+    }
+}
+
+
+function updateSuperBoardUI() {
+    document.querySelectorAll('.small-board').forEach((board, index) => {
+        board.classList.remove('next-move-target');
+    });
+    superBoard.classList.remove('play-anywhere');
+
+    if (gameActive) {
+        if (nextActiveBoardIndex === null) {
+            superBoard.classList.add('play-anywhere');
+        } else if (document.querySelectorAll('.small-board')[nextActiveBoardIndex]) {
+            document.querySelectorAll('.small-board')[nextActiveBoardIndex].classList.add('next-move-target');
+        }
+    }
 }
 
 function startNewRound() {
     gameActive = true;
-    gameState = ['', '', '', '', '', '', '', '', ''];
-    currentPlayer = roundStarter;
     lastRoundResult = { winner: null, isDraw: false };
+    currentPlayer = roundStarter;
     
     statusDisplay.classList.remove('win-animation');
     player1Score.classList.remove('win-animation');
     player2Score.classList.remove('win-animation');
     roundResultStatus.innerHTML = '';
     
-    player1Info.classList.toggle('active', currentPlayer === playerSymbols.p1);
-    player2Info.classList.toggle('active', currentPlayer === playerSymbols.p2);
-
+    clearEndGameButtons();
+    
+    gameState = Array(9).fill('');
     cells.forEach(cell => {
         cell.innerHTML = '';
         cell.classList.remove('occupied', 'win', 'p1-win', 'p2-win');
     });
+
+    smallBoardStates = Array(9).fill(null).map(() => Array(9).fill(''));
+    mainBoardState = Array(9).fill('');
+    nextActiveBoardIndex = null;
     
-    clearEndGameButtons();
-    nextRoundBtn.style.display = 'none';
-    updateScoreboard();
+    document.querySelectorAll('.small-board').forEach(sBoard => {
+        sBoard.className = 'small-board';
+        sBoard.querySelector('.small-board-overlay').innerHTML = '';
+    });
+    document.querySelectorAll('.super-cell').forEach(cell => {
+         cell.innerHTML = '';
+         cell.classList.remove('occupied');
+    });
+    updateSuperBoardUI();
+    
+    player1Info.classList.toggle('active', currentPlayer === playerSymbols.p1);
+    player2Info.classList.toggle('active', currentPlayer === playerSymbols.p2);
+    document.body.classList.toggle('p2-turn', currentPlayer === playerSymbols.p2);
     setLanguage(currentLanguage);
 }
 
@@ -444,14 +627,13 @@ function triggerCelebration() {
     const p1MatchScore = scores[playerSymbols.p1];
     const p2MatchScore = scores[playerSymbols.p2];
     let winner = null;
+
     if (p1MatchScore > p2MatchScore) winner = 'p1';
     else if (p2MatchScore > p1MatchScore) winner = 'p2';
-
+    
     if (winner && gameSettings.useColors) {
         gameContainer.classList.add(`${winner}-wins`);
-        setTimeout(() => {
-            gameContainer.classList.remove(`${winner}-wins`);
-        }, 2000);
+        setTimeout(() => gameContainer.classList.remove(`${winner}-wins`), 2000);
     }
     
     for (let i = 0; i < 100; i++) {
@@ -462,9 +644,7 @@ function triggerCelebration() {
         confetti.style.backgroundColor = RAINBOW_COLORS[Math.floor(Math.random() * RAINBOW_COLORS.length)];
         confettiContainer.appendChild(confetti);
     }
-    setTimeout(() => {
-        confettiContainer.innerHTML = '';
-    }, 5000);
+    setTimeout(() => confettiContainer.innerHTML = '', 5000);
 }
 
 
@@ -475,11 +655,8 @@ function checkMatchOver() {
         
         let currentH2H = {...headToHeadScores};
 
-        if (p1MatchScore > p2MatchScore) {
-            headToHeadScores.p1++;
-        } else if (p2MatchScore > p1MatchScore) {
-            headToHeadScores.p2++;
-        }
+        if (p1MatchScore > p2MatchScore) headToHeadScores.p1++;
+        else if (p2MatchScore > p1MatchScore) headToHeadScores.p2++;
         
         matchHistories[matchCount-1].finalScores = {...scores};
         matchHistories[matchCount-1].finalH2H = {...headToHeadScores};
@@ -503,19 +680,14 @@ function populateRecapModal(matchNum) {
     if (!matchHistories[matchNum-1]) return;
     const t = translations[currentLanguage];
     const history = matchHistories[matchNum-1];
-    
     const { p1Name, p2Name, p1Symbol, p2Symbol, finalScores, finalH2H, rounds } = history;
     
     const p1MatchScore = finalScores[p1Symbol];
     const p2MatchScore = finalScores[p2Symbol];
 
-    if (p1MatchScore > p2MatchScore) {
-        recapWinner.textContent = t.matchWinner(p1Name);
-    } else if (p2MatchScore > p1MatchScore) {
-        recapWinner.textContent = t.matchWinner(p2Name);
-    } else {
-        recapWinner.textContent = t.matchDraw;
-    }
+    if (p1MatchScore > p2MatchScore) recapWinner.textContent = t.matchWinner(p1Name);
+    else if (p2MatchScore > p1MatchScore) recapWinner.textContent = t.matchWinner(p2Name);
+    else recapWinner.textContent = t.matchDraw;
 
     recapP1Name.textContent = p1Name;
     recapP2Name.textContent = p2Name;
@@ -534,19 +706,9 @@ function populateRecapModal(matchNum) {
     rounds.forEach(round => {
         const item = document.createElement('div');
         item.className = 'timeline-item';
-        
-        let winnerTop = '';
-        let winnerBottom = '';
-        let dotClass = 'draw';
-
-        if(round.winner) {
-            const winnerIsP1 = round.winner === p1Symbol;
-            winnerTop = winnerIsP1 ? t.recapRoundItem(p1Name) : '';
-            winnerBottom = !winnerIsP1 ? t.recapRoundItem(p2Name) : '';
-            dotClass = winnerIsP1 ? 'p1-win' : 'p2-win';
-        } else {
-            winnerTop = t.recapRoundDraw;
-        }
+        let winnerTop = round.winner ? (round.winner === p1Symbol ? t.recapRoundItem(p1Name) : '') : t.recapRoundDraw;
+        let winnerBottom = round.winner ? (round.winner === p2Symbol ? t.recapRoundItem(p2Name) : '') : '';
+        let dotClass = round.winner ? (round.winner === p1Symbol ? 'p1-win' : 'p2-win') : 'draw';
 
         item.innerHTML = `
             <span class="winner-label winner-top">${winnerTop}</span>
@@ -560,41 +722,43 @@ function populateRecapModal(matchNum) {
 function clearEndGameButtons() {
     buttonContainer.innerHTML = '';
     buttonContainer.appendChild(nextRoundBtn);
+    nextRoundBtn.style.display = 'none';
 }
 
 function updateEndGameButtons() {
     const t = translations[currentLanguage];
     clearEndGameButtons();
-    if (!gameActive && currentRound < gameSettings.totalRounds) {
-        nextRoundBtn.style.display = 'block';
-        nextRoundBtn.textContent = t.nextRoundBtnText;
-    } else if (!gameActive && currentRound >= gameSettings.totalRounds) {
-        nextRoundBtn.style.display = 'none';
 
-        const rematchBtn = document.createElement('button');
-        rematchBtn.id = 'rematchBtn';
-        rematchBtn.innerHTML = `${SVG_RETRY} ${t.rematchBtn}`;
-        rematchBtn.onclick = startRematch;
+    if (!gameActive) {
+        if (currentRound < gameSettings.totalRounds) {
+            nextRoundBtn.style.display = 'block';
+            nextRoundBtn.textContent = t.nextRoundBtnText;
+        } else {
+            nextRoundBtn.style.display = 'none';
 
-        const showRecapBtn = document.createElement('button');
-        showRecapBtn.id = 'showRecapBtn';
-        showRecapBtn.textContent = t.showRecapBtn;
-        showRecapBtn.onclick = () => {
-             clearTimeout(recapTimeoutId);
-             currentRecapMatch = matchCount;
-             setLanguage(currentLanguage);
-             populateRecapModal(currentRecapMatch);
-             recapModal.classList.add('active');
-        };
-        
-        const backToMenuBtn = document.createElement('button');
-        backToMenuBtn.id = 'backToMenuBtn';
-        backToMenuBtn.textContent = t.backToMenuBtn;
-        backToMenuBtn.onclick = returnToMainMenu;
-        
-        buttonContainer.appendChild(rematchBtn);
-        buttonContainer.appendChild(showRecapBtn);
-        buttonContainer.appendChild(backToMenuBtn);
+            const rematchBtn = document.createElement('button');
+            rematchBtn.id = 'rematchBtn';
+            rematchBtn.innerHTML = `${SVG_RETRY} ${t.rematchBtn}`;
+            rematchBtn.onclick = startRematch;
+            buttonContainer.appendChild(rematchBtn);
+
+            const showRecapBtn = document.createElement('button');
+            showRecapBtn.id = 'showRecapBtn';
+            showRecapBtn.textContent = t.showRecapBtn;
+            showRecapBtn.onclick = () => {
+                clearTimeout(recapTimeoutId);
+                currentRecapMatch = matchCount;
+                populateRecapModal(currentRecapMatch);
+                recapModal.classList.add('active');
+            };
+            buttonContainer.appendChild(showRecapBtn);
+            
+            const backToMenuBtn = document.createElement('button');
+            backToMenuBtn.id = 'backToMenuBtn';
+            backToMenuBtn.textContent = t.backToMenuBtn;
+            backToMenuBtn.onclick = returnToMainMenu;
+            buttonContainer.appendChild(backToMenuBtn);
+        }
     }
 }
 
@@ -614,44 +778,50 @@ function startRematch() {
 }
 
 function startMatch() {
-    scores = { X: 0, O: 0 };
+    scores = { [playerSymbols.p1]: 0, [playerSymbols.p2]: 0 };
     currentRound = 1;
-
+    
     matchCount++;
     matchHistories.push({
-        matchNum: matchCount,
-        p1Name: playerNames.p1,
-        p2Name: playerNames.p2,
-        p1Symbol: playerSymbols.p1,
-        p2Symbol: playerSymbols.p2,
-        rounds: [],
-        finalScores: {},
-        initialH2H: {...headToHeadScores}
+        matchNum: matchCount, p1Name: playerNames.p1, p2Name: playerNames.p2,
+        p1Symbol: playerSymbols.p1, p2Symbol: playerSymbols.p2,
+        rounds: [], finalScores: {}, initialH2H: {...headToHeadScores}
     });
-
     roundStarter = gameSettings.match1Round1Starter === 'p1' ? playerSymbols.p1 : playerSymbols.p2;
 
+    board.style.display = currentGameMode === 'normal' ? 'grid' : 'none';
+    superBoard.style.display = currentGameMode === 'super' ? 'grid' : 'none';
+    
     updatePlayerTags();
     startNewRound();
 }
 
 function returnToMainMenu() {
     clearTimeout(recapTimeoutId);
+    exitConfirmationModal.classList.remove('active');
     appContainer.classList.remove('active');
     mainMenuScreen.classList.add('active');
     recapModal.classList.remove('active');
-
+    inGameSettingsModal.classList.remove('active');
     lastRoundResult = { winner: null, isDraw: false };
-    
     statusDisplay.innerHTML = '&nbsp;';
     roundResultStatus.innerHTML = '';
-    
     const t = translations[currentLanguage];
     roundDisplay.textContent = t.roundStatus(1, gameSettings.totalRounds);
-    
     p1NameInput.value = '';
     p2NameInput.value = '';
+    
+    settingsCache = {
+        normal: { totalRounds: 3 },
+        super: { totalRounds: 2, useTieBreaker: false }
+    };
+    roundSlider.value = settingsCache.normal.totalRounds;
+    roundValueDisplay.textContent = settingsCache.normal.totalRounds;
+    tieBreakerCheck.checked = settingsCache.super.useTieBreaker;
 
+    if (currentGameMode !== 'normal') {
+        modeNormalBtn.click();
+    }
     gameSettings.match1Round1Starter = 'p1';
     chooseP1Start.classList.add('selected');
     chooseP2Start.classList.remove('selected');
@@ -659,10 +829,8 @@ function returnToMainMenu() {
 
 function updatePlayerTags() {
     const t = translations[currentLanguage];
-    
     player1Name.textContent = playerNames.p1;
     player2Name.textContent = playerNames.p2;
-
     player1Tag.textContent = `${t.player1Tag} (${playerSymbols.p1})`;
     player2Tag.textContent = `${t.player2Tag} (${playerSymbols.p2})`;
     
@@ -680,10 +848,8 @@ function updateSymbolButtonColors() {
     document.body.classList.toggle('custom-colors-active', gameSettings.useColors);
     const p1Selected = p1SymbolPicker.querySelector('.selected');
     const p2Selected = p2SymbolPicker.querySelector('.selected');
-    
     p1SymbolPicker.querySelectorAll('.symbol-btn').forEach(b => b.classList.remove('p1-color','p2-color'));
     p2SymbolPicker.querySelectorAll('.symbol-btn').forEach(b => b.classList.remove('p1-color','p2-color'));
-
     if (p1Selected) p1Selected.classList.add('p1-color');
     if (p2Selected) p2Selected.classList.add('p2-color');
 }
@@ -705,7 +871,6 @@ function generateColorSwatches() {
             swatch.addEventListener('click', () => {
                 const otherPlayerColor = isP1 ? gameSettings.p2Color : gameSettings.p1Color;
                 if (color === otherPlayerColor) return;
-
                 const player = isP1 ? 'p1' : 'p2';
                 gameSettings[`${player}Color`] = color;
                 document.documentElement.style.setProperty(`--${player}-color`, color);
@@ -717,6 +882,7 @@ function generateColorSwatches() {
                 otherContainer.querySelectorAll('.color-swatch').forEach(s => {
                     s.classList.toggle('disabled', s.dataset.color === color);
                 });
+                otherContainer.querySelector(`[data-color="${otherPlayerColor}"]`)?.classList.remove('disabled');
                 updateSymbolButtonColors();
             });
             container.appendChild(swatch);
@@ -726,6 +892,7 @@ function generateColorSwatches() {
      p1ColorOptions.querySelector(`[data-color="${gameSettings.p2Color}"]`)?.classList.add('disabled');
 }
 
+
 function initializeSettings() {
     [p1SymbolPicker, p2SymbolPicker].forEach((picker, index) => {
         const isP1 = index === 0;
@@ -733,13 +900,10 @@ function initializeSettings() {
             if (e.target.classList.contains('symbol-btn')) {
                 const selectedSymbol = e.target.dataset.symbol;
                 const otherSymbol = selectedSymbol === 'X' ? 'O' : 'X';
-                
                 playerSymbols[isP1 ? 'p1' : 'p2'] = selectedSymbol;
                 playerSymbols[isP1 ? 'p2' : 'p1'] = otherSymbol;
-
                 picker.querySelector('.selected')?.classList.remove('selected');
                 e.target.classList.add('selected');
-
                 const otherPicker = isP1 ? p2SymbolPicker : p1SymbolPicker;
                 otherPicker.querySelector('.selected')?.classList.remove('selected');
                 otherPicker.querySelector(`[data-symbol="${otherSymbol}"]`).classList.add('selected');
@@ -755,10 +919,8 @@ function validateSettings() {
     const t = translations[currentLanguage];
     const forbiddenNames = ["seri", "draw", "tie"];
     settingsError.textContent = '';
-
     let p1Name = p1NameInput.value.trim();
     let p2Name = p2NameInput.value.trim();
-    
     if (forbiddenNames.includes(p1Name.toLowerCase()) || forbiddenNames.includes(p2Name.toLowerCase())) {
         settingsError.textContent = t.errorForbiddenName;
         return false;
@@ -767,23 +929,61 @@ function validateSettings() {
         settingsError.textContent = t.errorSameName;
         return false;
     }
-
     playerNames.p1 = p1Name || t.player1Tag;
     playerNames.p2 = p2Name || t.player2Tag;
     return true;
 }
 
-function openRulesModal(activeTabId) {
-    tabLinks.forEach(link => link.classList.remove('active'));
-    tabContents.forEach(content => content.classList.remove('active'));
+function createSuperBoard() {
+    superBoard.innerHTML = '';
+    for (let i = 0; i < 9; i++) {
+        const smallBoard = document.createElement('div');
+        smallBoard.className = 'small-board';
+        smallBoard.dataset.mainIndex = i;
+        for (let j = 0; j < 9; j++) {
+            const cell = document.createElement('div');
+            cell.className = 'cell super-cell';
+            cell.dataset.index = j;
+            smallBoard.appendChild(cell);
+        }
+        const overlay = document.createElement('div');
+        overlay.className = 'small-board-overlay';
+        smallBoard.appendChild(overlay);
+        superBoard.appendChild(smallBoard);
+    }
+    superBoard.addEventListener('click', handleCellClick);
+    superBoard.addEventListener('mouseover', handleSuperBoardMouseOver);
+    superBoard.addEventListener('mouseout', handleSuperBoardMouseOut);
+}
 
-    const tabToActivate = document.querySelector(`.tab-link[data-tab="${activeTabId}"]`);
-    const contentToActivate = document.getElementById(activeTabId);
-
-    if (tabToActivate) tabToActivate.classList.add('active');
-    if (contentToActivate) contentToActivate.classList.add('active');
+function handleSuperBoardMouseOver(e) {
+    if (!gameActive) return;
+    const hoveredCell = e.target.closest('.super-cell');
     
-    rulesModal.classList.add('active');
+    if (hoveredCell && !hoveredCell.classList.contains('occupied')) {
+        const parentBoard = hoveredCell.closest('.small-board');
+        const isPlayable = parentBoard.classList.contains('next-move-target') || superBoard.classList.contains('play-anywhere');
+        
+        if (isPlayable && !parentBoard.classList.contains('board-won') && !parentBoard.classList.contains('board-draw')) {
+            const nextBoardIndex = parseInt(hoveredCell.dataset.index);
+            const allSmallBoards = document.querySelectorAll('.small-board');
+            
+            if (allSmallBoards[nextBoardIndex] && !allSmallBoards[nextBoardIndex].classList.contains('board-won') && !allSmallBoards[nextBoardIndex].classList.contains('board-draw')) {
+                allSmallBoards[nextBoardIndex].classList.add('predict-highlight');
+            }
+        }
+    }
+}
+
+function handleSuperBoardMouseOut() {
+    document.querySelectorAll('.small-board.predict-highlight').forEach(board => {
+        board.classList.remove('predict-highlight');
+    });
+}
+
+function toggleSettingsVisibility() {
+    const isSuper = currentGameMode === 'super';
+    tieBreakerSetting.style.display = isSuper ? 'flex' : 'none';
 }
 
 // Event Listeners
@@ -793,11 +993,36 @@ newGameBtn.addEventListener('click', () => {
 });
 
 howToPlayOpenBtn.addEventListener('click', () => {
-    openRulesModal('howToPlayTab');
+    rulesModal.classList.add('active');
+    document.querySelector('.tab-link[data-tab="howToPlayTab"]').click();
 });
 
 rulesOpenBtn.addEventListener('click', () => {
-    openRulesModal('rulesTab');
+    rulesModal.classList.add('active');
+    document.querySelector('.tab-link[data-tab="rulesTab"]').click();
+});
+
+modeNormalBtn.addEventListener('click', () => {
+    if (currentGameMode === 'normal') return;
+    settingsCache.super.totalRounds = parseInt(roundSlider.value);
+    settingsCache.super.useTieBreaker = tieBreakerCheck.checked;
+    roundSlider.value = settingsCache.normal.totalRounds;
+    roundValueDisplay.textContent = settingsCache.normal.totalRounds;
+    currentGameMode = 'normal';
+    modeNormalBtn.classList.add('selected');
+    modeSuperBtn.classList.remove('selected');
+    toggleSettingsVisibility();
+});
+modeSuperBtn.addEventListener('click', () => {
+    if (currentGameMode === 'super') return;
+    settingsCache.normal.totalRounds = parseInt(roundSlider.value);
+    roundSlider.value = settingsCache.super.totalRounds;
+    roundValueDisplay.textContent = settingsCache.super.totalRounds;
+    tieBreakerCheck.checked = settingsCache.super.useTieBreaker;
+    currentGameMode = 'super';
+    modeSuperBtn.classList.add('selected');
+    modeNormalBtn.classList.remove('selected');
+    toggleSettingsVisibility();
 });
 
 chooseP1Start.addEventListener('click', () => {
@@ -821,38 +1046,53 @@ useColorsCheck.addEventListener('change', (e) => {
 startGameBtn.addEventListener('click', () => {
     if (!validateSettings()) return;
 
-    gameSettings.totalRounds = parseInt(roundSlider.value);
+    if (currentGameMode === 'normal') {
+        settingsCache.normal.totalRounds = parseInt(roundSlider.value);
+        gameSettings.totalRounds = settingsCache.normal.totalRounds;
+        gameSettings.useTieBreaker = false;
+    } else {
+        settingsCache.super.totalRounds = parseInt(roundSlider.value);
+        settingsCache.super.useTieBreaker = tieBreakerCheck.checked;
+        gameSettings.totalRounds = settingsCache.super.totalRounds;
+        gameSettings.useTieBreaker = settingsCache.super.useTieBreaker;
+    }
+    
     gameSettings.alternateTurns = alternateTurnsCheck.checked;
     gameSettings.alternateOnRematch = alternateRematchCheck.checked;
     
     settingsModal.classList.remove('active');
     appContainer.classList.add('active');
-    
     startFirstMatch();
 });
 
-roundSlider.addEventListener('input', () => {
-    roundValueDisplay.textContent = roundSlider.value;
-});
+roundSlider.addEventListener('input', () => roundValueDisplay.textContent = roundSlider.value);
 
 nextRoundBtn.addEventListener('click', () => {
     currentRound++;
     if (gameSettings.alternateTurns) {
-        roundStarter = (roundStarter === 'X') ? 'O' : 'X';
+        roundStarter = (roundStarter === playerSymbols.p1) ? playerSymbols.p2 : playerSymbols.p1;
     }
     startNewRound();
 });
 
-[settingsModal, recapModal, rulesModal].forEach(modal => {
+[settingsModal, recapModal, rulesModal, inGameSettingsModal, exitConfirmationModal].forEach(modal => {
     modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            modal.classList.remove('active');
-            if (modal === settingsModal) mainMenuScreen.classList.add('active');
-        }
+        if (e.target.closest('.modal-content') || e.target.closest('.ingame-btn')) return;
+        modal.classList.remove('active');
+        if (modal === settingsModal) mainMenuScreen.classList.add('active');
     });
 });
+
+settingsCloseBtnX.addEventListener('click', () => {
+    settingsModal.classList.remove('active');
+    mainMenuScreen.classList.add('active');
+});
+
 recapCloseBtn.addEventListener('click', () => recapModal.classList.remove('active'));
+recapCloseBtnX.addEventListener('click', () => recapModal.classList.remove('active'));
 rulesCloseBtn.addEventListener('click', () => rulesModal.classList.remove('active'));
+rulesCloseBtnX.addEventListener('click', () => rulesModal.classList.remove('active'));
+
 
 tabLinks.forEach(tab => {
     tab.addEventListener('click', () => {
@@ -860,6 +1100,14 @@ tabLinks.forEach(tab => {
         tabContents.forEach(content => content.classList.remove('active'));
         tab.classList.add('active');
         document.getElementById(tab.dataset.tab).classList.add('active');
+    });
+});
+subTabLinks.forEach(tab => {
+    tab.addEventListener('click', () => {
+        subTabLinks.forEach(link => link.classList.remove('active'));
+        subTabContents.forEach(content => content.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById(tab.dataset.subTab).classList.add('active');
     });
 });
 
@@ -876,18 +1124,62 @@ nextMatchBtn.addEventListener('click', () => {
     }
 });
 
+exitGameBtn.addEventListener('click', () => {
+    exitConfirmationModal.classList.add('active');
+});
+cancelExitBtn.addEventListener('click', () => {
+    exitConfirmationModal.classList.remove('active');
+});
+confirmExitBtn.addEventListener('click', returnToMainMenu);
+
+inGameSettingsBtn.addEventListener('click', () => inGameSettingsModal.classList.add('active'));
+inGameSettingsCloseBtn.addEventListener('click', () => inGameSettingsModal.classList.remove('active'));
+
+alignTopBtn.addEventListener('click', () => {
+    gameSettings.scoreboardAlign = 'top';
+    mainContentWrapper.className = 'align-top';
+    document.querySelector('#scoreboardAlignLabel + .option-group .selected').classList.remove('selected');
+    alignTopBtn.classList.add('selected');
+});
+alignCenterBtn.addEventListener('click', () => {
+    gameSettings.scoreboardAlign = 'center';
+    mainContentWrapper.className = '';
+    document.querySelector('#scoreboardAlignLabel + .option-group .selected').classList.remove('selected');
+    alignCenterBtn.classList.add('selected');
+});
+alignBottomBtn.addEventListener('click', () => {
+    gameSettings.scoreboardAlign = 'bottom';
+    mainContentWrapper.className = 'align-bottom';
+    document.querySelector('#scoreboardAlignLabel + .option-group .selected').classList.remove('selected');
+    alignBottomBtn.classList.add('selected');
+});
+
+drawIndicatorOnBtn.addEventListener('click', () => {
+    gameSettings.drawIndicatorMode = 'on';
+    document.body.className = `draw-indicator-on ${gameSettings.useColors ? 'custom-colors-active' : ''}`;
+    document.querySelector('#drawIndicatorLabel + .option-group .selected').classList.remove('selected');
+    drawIndicatorOnBtn.classList.add('selected');
+});
+drawIndicatorHoverBtn.addEventListener('click', () => {
+    gameSettings.drawIndicatorMode = 'hover';
+    document.body.className = `draw-indicator-hover ${gameSettings.useColors ? 'custom-colors-active' : ''}`;
+    document.querySelector('#drawIndicatorLabel + .option-group .selected').classList.remove('selected');
+    drawIndicatorHoverBtn.classList.add('selected');
+});
+drawIndicatorOffBtn.addEventListener('click', () => {
+    gameSettings.drawIndicatorMode = 'off';
+    document.body.className = `draw-indicator-off ${gameSettings.useColors ? 'custom-colors-active' : ''}`;
+    document.querySelector('#drawIndicatorLabel + .option-group .selected').classList.remove('selected');
+    drawIndicatorOffBtn.classList.add('selected');
+});
+
+
 window.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
-        if(settingsModal.classList.contains('active')) {
-            settingsModal.classList.remove('active');
-            mainMenuScreen.classList.add('active');
-        }
-        if(recapModal.classList.contains('active')) {
-            recapModal.classList.remove('active');
-        }
-        if(rulesModal.classList.contains('active')) {
-            rulesModal.classList.remove('active');
-        }
+        document.querySelectorAll('.modal.active').forEach(modal => {
+             modal.classList.remove('active');
+             if (modal === settingsModal) mainMenuScreen.classList.add('active');
+        });
     }
 });
 
@@ -899,10 +1191,18 @@ document.querySelectorAll('.language-option').forEach(btn => btn.addEventListene
 
 window.addEventListener('load', () => {
     initializeSettings();
+    createSuperBoard();
     setLanguage('id');
     generateColorSwatches();
     chooseP1Start.classList.add('selected');
     document.documentElement.style.setProperty('--p1-color', gameSettings.p1Color);
     document.documentElement.style.setProperty('--p2-color', gameSettings.p2Color);
+    
+    roundSlider.value = settingsCache.normal.totalRounds;
+    roundValueDisplay.textContent = settingsCache.normal.totalRounds;
+    tieBreakerCheck.checked = settingsCache.super.useTieBreaker;
+    toggleSettingsVisibility();
+    
+    document.body.classList.add('draw-indicator-on');
 });
 
