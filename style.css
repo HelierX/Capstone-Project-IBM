@@ -178,18 +178,53 @@ body {
     width: 100%;
 }
 
-.game-container h1 {
-    margin-top: 0;
+.logo-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 60px);
+    grid-template-rows: repeat(3, 60px);
+    gap: 8px;
+    margin-bottom: 25px;
+    position: relative;
 }
 
-h1 {
-    font-size: 2.5em;
-    margin-bottom: 20px;
-    background: linear-gradient(45deg, #a77dff, #ff8989);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+.logo-cell {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5em;
+    font-weight: bold;
+    color: transparent;
     background-clip: text;
+    -webkit-background-clip: text;
+    background-image: linear-gradient(45deg, #a77dff, #ff8989);
 }
+
+.logo-grid::before, .logo-grid::after {
+    content: '';
+    position: absolute;
+    background-color: #4c4d6a;
+}
+
+/* Vertical lines */
+.logo-grid::before {
+    top: 0;
+    bottom: 0;
+    left: calc(60px + 3px);
+    width: 2px;
+    box-shadow: calc(60px + 8px) 0 0 #4c4d6a;
+}
+
+/* Horizontal lines */
+.logo-grid::after {
+    left: 0;
+    right: 0;
+    top: calc(60px + 3px);
+    height: 2px;
+    box-shadow: 0 calc(60px + 8px) 0 #4c4d6a;
+}
+
 
 .status {
     font-size: 1.2em;
@@ -439,19 +474,34 @@ body.custom-colors-active .timeline-dot.p2-win { background-color: var(--p2-colo
     right: 20px;
     z-index: 1001;
 }
-.language-dropdown { position: relative; display: inline-block; }
+.language-dropdown { 
+    position: relative; 
+    display: inline-block;
+}
+
+.ingame-language-dropdown {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
 .language-btn {
     background-color: #3b3c5a;
     color: white;
-    padding: 6px 10px;
+    padding: 10px 15px;
     border: none;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 0.9em;
+    font-size: 1em;
     display: flex;
     align-items: center;
-    gap: 6px;
+    justify-content: center;
+    gap: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    width: auto;
+}
+.ingame-language-dropdown .language-btn {
+    width: 200px;
 }
 .language-btn img {
     width: 24px;
@@ -476,11 +526,20 @@ body.custom-colors-active .timeline-dot.p2-win { background-color: var(--p2-colo
     opacity: 0;
     transform: translateY(-10px);
     transition: visibility 0.3s, opacity 0.3s, transform 0.3s;
+    z-index: 2;
+}
+.ingame-language-dropdown .language-options-dropdown {
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%) translateY(-10px);
 }
 .language-dropdown:hover .language-options-dropdown {
     visibility: visible;
     opacity: 1;
     transform: translateY(0);
+}
+.ingame-language-dropdown:hover .language-options-dropdown {
+    transform: translateX(-50%) translateY(0);
 }
 .language-option {
     background-color: transparent;
@@ -497,6 +556,9 @@ body.custom-colors-active .timeline-dot.p2-win { background-color: var(--p2-colo
     font-size: 0.9em;
 }
 .language-option:hover { background-color: #5b608b; }
+.language-option.selected {
+    background-color: #5b608b;
+}
 .language-option img {
     width: 24px;
     height: 16px;
@@ -899,12 +961,13 @@ body.custom-colors-active .symbol-btn.selected.p2-color { background-color: var(
 .option-group {
     display: flex;
     justify-content: center;
-    gap: 20px;
+    gap: 10px;
+    flex-wrap: wrap;
     margin-bottom: 15px;
 }
 .option-btn {
-    padding: 10px 20px;
-    font-size: 1em;
+    padding: 10px 15px;
+    font-size: 0.9em;
     border-radius: 10px;
     cursor: pointer;
     border: 2px solid #4c4d6a;
@@ -1265,14 +1328,24 @@ body.draw-indicator-on .small-board.board-draw .small-board-overlay .x-char {
     opacity: 1;
 }
 
-body.draw-indicator-hover .small-board.board-draw .small-board-overlay .x-char {
+body.draw-indicator-hover-one .small-board.board-draw .small-board-overlay .x-char {
     visibility: hidden;
     opacity: 0;
 }
-body.draw-indicator-hover .small-board.board-draw:hover .small-board-overlay .x-char {
+body.draw-indicator-hover-one .small-board.board-draw:hover .small-board-overlay .x-char {
     visibility: visible;
     opacity: 1;
 }
+
+body.draw-indicator-hover-all .small-board.board-draw .small-board-overlay .x-char {
+    visibility: hidden;
+    opacity: 0;
+}
+body.draw-indicator-hover-all.any-draw-hovered .small-board.board-draw .small-board-overlay .x-char {
+    visibility: visible;
+    opacity: 1;
+}
+
 
 body.draw-indicator-off .small-board.board-draw .small-board-overlay .x-char {
     visibility: hidden;
@@ -1343,6 +1416,13 @@ body.draw-indicator-off .small-board.board-draw .small-board-overlay .x-char {
         width: 100%;
         height: auto;
         aspect-ratio: 1 / 1;
+    }
+    .draw-indicator-options {
+        gap: 5px;
+    }
+    .draw-indicator-options .option-btn {
+        padding: 8px 10px;
+        font-size: 0.8em;
     }
 }
 
