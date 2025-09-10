@@ -11,7 +11,17 @@
 
     <!-- Main Menu Screen -->
     <div id="mainMenuScreen" class="menu-screen active">
-        <h1 id="mainMenuTitle">Tic Tac Toe</h1>
+        <div class="logo-grid">
+            <div class="logo-cell">Tic</div>
+            <div class="logo-cell"></div>
+            <div class="logo-cell"></div>
+            <div class="logo-cell"></div>
+            <div class="logo-cell">Tac</div>
+            <div class="logo-cell"></div>
+            <div class="logo-cell"></div>
+            <div class="logo-cell"></div>
+            <div class="logo-cell">Toe</div>
+        </div>
         <div class="main-menu-buttons">
             <button id="newGameBtn" class="menu-btn icon-text-btn">
                 <svg class="play-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M8 5V19L19 12L8 5Z"/></svg>
@@ -23,6 +33,12 @@
                 </button>
                 <button id="rulesOpenBtn" class="menu-btn secondary icon-btn" aria-label="Aturan" title="Aturan">
                     <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                </button>
+                <button id="settingsOpenBtn" class="menu-btn secondary icon-btn" aria-label="Pengaturan" title="Pengaturan">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                       <circle cx="12" cy="12" r="3"></circle>
+                       <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                   </svg>
                 </button>
             </div>
         </div>
@@ -208,6 +224,24 @@
             <div class="modal-content">
                 <h2 id="inGameSettingsTitle">Pengaturan Dalam Game</h2>
                 
+                <div class="setting-group">
+                    <label id="languageSelectLabel">Pilih Bahasa</label>
+                    <div class="language-dropdown ingame-language-dropdown">
+                        <button class="language-btn">
+                            <img id="currentFlagInGame" src="https://flagcdn.com/id.svg" alt="Bendera Indonesia">
+                            <span id="currentLangInGame">Indonesia</span>
+                        </button>
+                        <div class="language-options-dropdown">
+                            <button class="language-option" data-lang="id">
+                                <img src="https://flagcdn.com/id.svg" alt="Bendera Indonesia"> Indonesia
+                            </button>
+                            <button class="language-option" data-lang="en">
+                                <img src="https://flagcdn.com/us.svg" alt="Bendera Amerika"> English (US)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                  <div class="setting-group">
                     <label id="controlsPositionLabel">Posisi Tombol Kontrol</label>
                     <div class="option-group">
@@ -228,9 +262,10 @@
 
                 <div class="setting-group">
                     <label id="drawIndicatorLabel">Penanda Seri (Mode Super)</label>
-                    <div class="option-group">
+                    <div class="option-group draw-indicator-options">
                         <button class="option-btn" id="drawIndicatorOnBtn">Selalu Aktif</button>
-                        <button class="option-btn" id="drawIndicatorHoverBtn">Saat Hover</button>
+                        <button class="option-btn" id="drawIndicatorHoverOneBtn">Hover (Satu)</button>
+                        <button class="option-btn" id="drawIndicatorHoverAllBtn">Hover (Semua)</button>
                         <button class="option-btn" id="drawIndicatorOffBtn">Nonaktif</button>
                     </div>
                 </div>
