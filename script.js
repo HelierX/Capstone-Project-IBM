@@ -51,6 +51,7 @@ const newGameBtn = document.querySelector('#newGameBtn');
 const newGameBtnText = document.querySelector('#newGameBtnText');
 const howToPlayOpenBtn = document.querySelector('#howToPlayOpenBtn');
 const rulesOpenBtn = document.querySelector('#rulesOpenBtn');
+const settingsOpenBtn = document.querySelector('#settingsOpenBtn');
 const rulesCloseBtn = document.querySelector('#rules-close-btn');
 const rulesCloseBtnX = document.querySelector('#rules-close-btn-x');
 const settingsCloseBtnX = document.querySelector('#settings-close-btn-x');
@@ -99,7 +100,8 @@ const alignTopBtn = document.querySelector('#alignTopBtn');
 const alignCenterBtn = document.querySelector('#alignCenterBtn');
 const alignBottomBtn = document.querySelector('#alignBottomBtn');
 const drawIndicatorOnBtn = document.querySelector('#drawIndicatorOnBtn');
-const drawIndicatorHoverBtn = document.querySelector('#drawIndicatorHoverBtn');
+const drawIndicatorHoverOneBtn = document.querySelector('#drawIndicatorHoverOneBtn');
+const drawIndicatorHoverAllBtn = document.querySelector('#drawIndicatorHoverAllBtn');
 const drawIndicatorOffBtn = document.querySelector('#drawIndicatorOffBtn');
 const mainContentWrapper = document.querySelector('#main-content-wrapper');
 const exitConfirmationModal = document.querySelector('#exitConfirmationModal');
@@ -110,6 +112,8 @@ const inGameControls = document.querySelector('.in-game-controls');
 const controlsTopBtn = document.querySelector('#controlsTopBtn');
 const controlsCenterBtn = document.querySelector('#controlsCenterBtn');
 const controlsBottomBtn = document.querySelector('#controlsBottomBtn');
+const currentLangInGame = document.querySelector('#currentLangInGame');
+const currentFlagInGame = document.querySelector('#currentFlagInGame');
 
 
 // Game State
@@ -176,6 +180,7 @@ const translations = {
         newGameBtn: "Permainan Baru",
         howToPlayBtnLabel: "Cara Bermain",
         rulesBtnLabel: "Aturan",
+        settingsBtnLabel: "Pengaturan",
         settingsModalTitle: "Pengaturan Permainan",
         gameModeLabel: "Mode Permainan",
         p1NamePlaceholder: "Nama Pemain 1",
@@ -218,14 +223,17 @@ const translations = {
         errorForbiddenName: "Nama tidak disarankan. Cek Aturan.",
         errorSameName: "Nama pemain tidak boleh sama.",
         flag: "https://flagcdn.com/id.svg",
+        langName: "Indonesia",
         inGameSettingsTitle: "Pengaturan Dalam Game",
+        languageSelectLabel: "Pilih Bahasa",
         scoreboardAlignLabel: "Posisi Papan Skor",
         alignTop: "Atas",
         alignCenter: "Tengah",
         alignBottom: "Bawah",
         drawIndicatorLabel: "Penanda Seri (Mode Super)",
         drawIndicatorOn: "Selalu Aktif",
-        drawIndicatorHover: "Saat Hover",
+        drawIndicatorHoverOne: "Hover (Satu)",
+        drawIndicatorHoverAll: "Hover (Semua)",
         drawIndicatorOff: "Nonaktif",
         inGameSettingsClose: "Kembali",
         exitGameTitle: "Keluar",
@@ -250,6 +258,7 @@ const translations = {
         newGameBtn: "New Game",
         howToPlayBtnLabel: "How to Play",
         rulesBtnLabel: "Rules",
+        settingsBtnLabel: "Settings",
         settingsModalTitle: "Game Settings",
         gameModeLabel: "Game Mode",
         p1NamePlaceholder: "Player 1 Name",
@@ -292,14 +301,17 @@ const translations = {
         errorForbiddenName: "Name not recommended. See Rules.",
         errorSameName: "Player names cannot be the same.",
         flag: "https://flagcdn.com/us.svg",
+        langName: "English (US)",
         inGameSettingsTitle: "In-Game Settings",
+        languageSelectLabel: "Select Language",
         scoreboardAlignLabel: "Scoreboard Position",
         alignTop: "Top",
         alignCenter: "Center",
         alignBottom: "Bottom",
         drawIndicatorLabel: "Draw Marker (Super Mode)",
         drawIndicatorOn: "Always On",
-        drawIndicatorHover: "On Hover",
+        drawIndicatorHoverOne: "Hover (One)",
+        drawIndicatorHoverAll: "Hover (All)",
         drawIndicatorOff: "Off",
         inGameSettingsClose: "Back",
         exitGameTitle: "Exit",
@@ -318,34 +330,36 @@ function setLanguage(lang) {
     const t = translations[lang];
     
     const elementsToTranslate = {
-        mainMenuTitle: t.gameTitleNormal, newGameBtnText: t.newGameBtn,
-        settingsModalTitle: t.settingsModalTitle, firstTurnLabel: t.firstTurnLabel,
-        startGameBtnText: t.startGameBtn,
-        recapTitle: t.recapTitle, recapHistoryTitle: t.recapHistoryTitle,
+        'newGameBtnText': t.newGameBtn,
+        'settingsModalTitle': t.settingsModalTitle, 'firstTurnLabel': t.firstTurnLabel,
+        'startGameBtnText': t.startGameBtn,
+        'recapTitle': t.recapTitle, 'recapHistoryTitle': t.recapHistoryTitle,
         'recap-close-btn': t.recapCloseBtn, 'round-title': t.roundTitle, 
-        p1ColorLabel: t.p1ColorLabel, p2ColorLabel: t.p2ColorLabel, 
-        'rules-close-btn': t.rulesCloseBtn, gameModeLabel: t.gameModeLabel, 
-        howToPlayTitle: t.howToPlayTitle, rulesTitle: t.rulesTitle,
-        howToPlayTabBtn: t.howToPlayTab, rulesTabBtn: t.rulesTab,
-        useColorsLabel: t.useColorsLabel,
-        inGameSettingsTitle: t.inGameSettingsTitle,
-        scoreboardAlignLabel: t.scoreboardAlignLabel,
-        alignTopBtn: t.alignTop,
-        alignCenterBtn: t.alignCenter,
-        alignBottomBtn: t.alignBottom,
-        drawIndicatorLabel: t.drawIndicatorLabel,
-        drawIndicatorOnBtn: t.drawIndicatorOn,
-        drawIndicatorHoverBtn: t.drawIndicatorHover,
-        drawIndicatorOffBtn: t.drawIndicatorOff,
-        inGameSettingsCloseBtn: t.inGameSettingsClose,
-        exitConfirmTitle: t.exitConfirmTitle,
-        exitConfirmText: t.exitConfirmText,
-        cancelExitBtn: t.cancel,
-        confirmExitBtn: t.exit,
-        controlsPositionLabel: t.controlsPositionLabel,
-        controlsTopBtn: t.alignTop,
-        controlsCenterBtn: t.alignCenter,
-        controlsBottomBtn: t.alignBottom
+        'p1ColorLabel': t.p1ColorLabel, 'p2ColorLabel': t.p2ColorLabel, 
+        'rules-close-btn': t.rulesCloseBtn, 'gameModeLabel': t.gameModeLabel, 
+        'howToPlayTitle': t.howToPlayTitle, 'rulesTitle': t.rulesTitle,
+        'howToPlayTabBtn': t.howToPlayTab, 'rulesTabBtn': t.rulesTab,
+        'useColorsLabel': t.useColorsLabel,
+        'inGameSettingsTitle': t.inGameSettingsTitle,
+        'languageSelectLabel': t.languageSelectLabel,
+        'scoreboardAlignLabel': t.scoreboardAlignLabel,
+        'alignTopBtn': t.alignTop,
+        'alignCenterBtn': t.alignCenter,
+        'alignBottomBtn': t.alignBottom,
+        'drawIndicatorLabel': t.drawIndicatorLabel,
+        'drawIndicatorOnBtn': t.drawIndicatorOn,
+        'drawIndicatorHoverOneBtn': t.drawIndicatorHoverOne,
+        'drawIndicatorHoverAllBtn': t.drawIndicatorHoverAll,
+        'drawIndicatorOffBtn': t.drawIndicatorOff,
+        'inGameSettingsCloseBtn': t.inGameSettingsClose,
+        'exitConfirmTitle': t.exitConfirmTitle,
+        'exitConfirmText': t.exitConfirmText,
+        'cancelExitBtn': t.cancel,
+        'confirmExitBtn': t.exit,
+        'controlsPositionLabel': t.controlsPositionLabel,
+        'controlsTopBtn': t.alignTop,
+        'controlsCenterBtn': t.alignCenter,
+        'controlsBottomBtn': t.alignBottom
     };
 
     for (const id in elementsToTranslate) {
@@ -367,6 +381,7 @@ function setLanguage(lang) {
 
     howToPlayOpenBtn.setAttribute('title', t.howToPlayBtnLabel);
     rulesOpenBtn.setAttribute('title', t.rulesBtnLabel);
+    settingsOpenBtn.setAttribute('title', t.settingsBtnLabel);
     exitGameBtn.setAttribute('title', t.exitGameTitle);
     inGameSettingsBtn.setAttribute('title', t.inGameSettingsTitleAttr);
     p1NameInput.placeholder = t.p1NamePlaceholder;
@@ -375,7 +390,20 @@ function setLanguage(lang) {
     chooseP2Start.textContent = t.player2Tag;
     
     document.querySelector('#roundLabelText').textContent = t.roundLabelText;
+    
+    // Update flags and text for both dropdowns
     document.querySelector('#currentFlag').src = t.flag;
+    document.querySelector('#currentFlagInGame').src = t.flag;
+    document.querySelector('#currentLangInGame').textContent = t.langName;
+
+
+    // Highlight selected language
+    document.querySelectorAll('.language-option').forEach(btn => {
+        btn.classList.remove('selected');
+        if (btn.dataset.lang === lang) {
+            btn.classList.add('selected');
+        }
+    });
 
     if (appContainer.classList.contains('active')) {
         gameTitle.textContent = currentGameMode === 'normal' ? t.gameTitleNormal : t.gameTitleSuper;
@@ -970,15 +998,28 @@ function createSuperBoard() {
         smallBoard.appendChild(overlay);
         superBoard.appendChild(smallBoard);
     }
-    superBoard.addEventListener('click', handleCellClick);
     superBoard.addEventListener('mouseover', handleSuperBoardMouseOver);
     superBoard.addEventListener('mouseout', handleSuperBoardMouseOut);
+    superBoard.addEventListener('click', handleCellClick);
 }
 
 function handleSuperBoardMouseOver(e) {
     if (!gameActive) return;
+
+    // Handle Hover (All) logic by toggling a class on the body
+    if (gameSettings.drawIndicatorMode === 'hover-all') {
+        const isHoveringDraw = e.target.closest('.small-board.board-draw');
+        document.body.classList.toggle('any-draw-hovered', !!isHoveringDraw);
+    }
+
+    // Handle prediction highlight logic
     const hoveredCell = e.target.closest('.super-cell');
     
+    // Clear previous prediction highlights first when moving between cells
+    document.querySelectorAll('.small-board.predict-highlight').forEach(board => {
+        board.classList.remove('predict-highlight');
+    });
+
     if (hoveredCell && !hoveredCell.classList.contains('occupied')) {
         const parentBoard = hoveredCell.closest('.small-board');
         const isPlayable = parentBoard.classList.contains('next-move-target') || superBoard.classList.contains('play-anywhere');
@@ -994,11 +1035,19 @@ function handleSuperBoardMouseOver(e) {
     }
 }
 
-function handleSuperBoardMouseOut() {
-    document.querySelectorAll('.small-board.predict-highlight').forEach(board => {
-        board.classList.remove('predict-highlight');
-    });
+function handleSuperBoardMouseOut(e) {
+    // This event fires when moving from the #superBoard to an element outside of it.
+    // We check if the new element (relatedTarget) is still inside the board. If not, we clean up.
+    if (!superBoard.contains(e.relatedTarget)) {
+        if (gameSettings.drawIndicatorMode === 'hover-all') {
+            document.body.classList.remove('any-draw-hovered');
+        }
+        document.querySelectorAll('.small-board.predict-highlight').forEach(board => {
+            board.classList.remove('predict-highlight');
+        });
+    }
 }
+
 
 function toggleSettingsVisibility() {
     const isSuper = currentGameMode === 'super';
@@ -1019,9 +1068,10 @@ function updateInGameSettingsUI() {
     else alignBottomBtn.classList.add('selected');
 
     // Draw Indicator
-    document.querySelector('#drawIndicatorLabel + .option-group .selected')?.classList.remove('selected');
+    document.querySelector('.draw-indicator-options .selected')?.classList.remove('selected');
     if (gameSettings.drawIndicatorMode === 'on') drawIndicatorOnBtn.classList.add('selected');
-    else if (gameSettings.drawIndicatorMode === 'hover') drawIndicatorHoverBtn.classList.add('selected');
+    else if (gameSettings.drawIndicatorMode === 'hover-one') drawIndicatorHoverOneBtn.classList.add('selected');
+    else if (gameSettings.drawIndicatorMode === 'hover-all') drawIndicatorHoverAllBtn.classList.add('selected');
     else drawIndicatorOffBtn.classList.add('selected');
 }
 
@@ -1029,6 +1079,12 @@ function updateInGameSettingsUI() {
 newGameBtn.addEventListener('click', () => {
     mainMenuScreen.classList.remove('active');
     settingsModal.classList.add('active');
+});
+
+settingsOpenBtn.addEventListener('click', () => {
+    mainMenuScreen.classList.remove('active');
+    updateInGameSettingsUI();
+    inGameSettingsModal.classList.add('active');
 });
 
 howToPlayOpenBtn.addEventListener('click', () => {
@@ -1116,9 +1172,13 @@ nextRoundBtn.addEventListener('click', () => {
 
 [settingsModal, recapModal, rulesModal, inGameSettingsModal, exitConfirmationModal].forEach(modal => {
     modal.addEventListener('click', (e) => {
-        if (e.target.closest('.modal-content') || e.target.closest('.ingame-btn')) return;
+        if (e.target.closest('.modal-content') || e.target.closest('.ingame-btn') || e.target.closest('.language-btn')) return;
         modal.classList.remove('active');
-        if (modal === settingsModal) mainMenuScreen.classList.add('active');
+        if (modal === settingsModal || modal === inGameSettingsModal) {
+            if (!appContainer.classList.contains('active')) {
+                mainMenuScreen.classList.add('active');
+            }
+        }
     });
 });
 
@@ -1175,65 +1235,55 @@ inGameSettingsBtn.addEventListener('click', () => {
     updateInGameSettingsUI();
     inGameSettingsModal.classList.add('active');
 });
-inGameSettingsCloseBtn.addEventListener('click', () => inGameSettingsModal.classList.remove('active'));
+inGameSettingsCloseBtn.addEventListener('click', () => {
+    inGameSettingsModal.classList.remove('active');
+    if (!appContainer.classList.contains('active')) {
+        mainMenuScreen.classList.add('active');
+    }
+});
 
 alignTopBtn.addEventListener('click', () => {
     gameSettings.scoreboardAlign = 'top';
     infoPanel.className = 'info-panel scoreboard-align-top';
-    document.querySelector('#scoreboardAlignLabel + .option-group .selected').classList.remove('selected');
-    alignTopBtn.classList.add('selected');
+    updateInGameSettingsUI();
 });
 alignCenterBtn.addEventListener('click', () => {
     gameSettings.scoreboardAlign = 'center';
     infoPanel.className = 'info-panel'; // default is center
-    document.querySelector('#scoreboardAlignLabel + .option-group .selected').classList.remove('selected');
-    alignCenterBtn.classList.add('selected');
+    updateInGameSettingsUI();
 });
 alignBottomBtn.addEventListener('click', () => {
     gameSettings.scoreboardAlign = 'bottom';
     infoPanel.className = 'info-panel scoreboard-align-bottom';
-    document.querySelector('#scoreboardAlignLabel + .option-group .selected').classList.remove('selected');
-    alignBottomBtn.classList.add('selected');
+    updateInGameSettingsUI();
 });
 
 controlsTopBtn.addEventListener('click', () => {
     gameSettings.controlsAlign = 'top';
     inGameControls.className = 'in-game-controls controls-align-top';
-    document.querySelector('#controlsPositionLabel + .option-group .selected').classList.remove('selected');
-    controlsTopBtn.classList.add('selected');
+    updateInGameSettingsUI();
 });
 controlsCenterBtn.addEventListener('click', () => {
     gameSettings.controlsAlign = 'center';
     inGameControls.className = 'in-game-controls controls-align-center';
-    document.querySelector('#controlsPositionLabel + .option-group .selected').classList.remove('selected');
-    controlsCenterBtn.classList.add('selected');
+    updateInGameSettingsUI();
 });
 controlsBottomBtn.addEventListener('click', () => {
     gameSettings.controlsAlign = 'bottom';
     inGameControls.className = 'in-game-controls controls-align-bottom';
-    document.querySelector('#controlsPositionLabel + .option-group .selected').classList.remove('selected');
-    controlsBottomBtn.classList.add('selected');
+    updateInGameSettingsUI();
 });
 
 
-drawIndicatorOnBtn.addEventListener('click', () => {
-    gameSettings.drawIndicatorMode = 'on';
-    document.body.className = `draw-indicator-on ${gameSettings.useColors ? 'custom-colors-active' : ''}`;
-    document.querySelector('#drawIndicatorLabel + .option-group .selected').classList.remove('selected');
-    drawIndicatorOnBtn.classList.add('selected');
-});
-drawIndicatorHoverBtn.addEventListener('click', () => {
-    gameSettings.drawIndicatorMode = 'hover';
-    document.body.className = `draw-indicator-hover ${gameSettings.useColors ? 'custom-colors-active' : ''}`;
-    document.querySelector('#drawIndicatorLabel + .option-group .selected').classList.remove('selected');
-    drawIndicatorHoverBtn.classList.add('selected');
-});
-drawIndicatorOffBtn.addEventListener('click', () => {
-    gameSettings.drawIndicatorMode = 'off';
-    document.body.className = `draw-indicator-off ${gameSettings.useColors ? 'custom-colors-active' : ''}`;
-    document.querySelector('#drawIndicatorLabel + .option-group .selected').classList.remove('selected');
-    drawIndicatorOffBtn.classList.add('selected');
-});
+function setDrawIndicatorMode(mode) {
+    gameSettings.drawIndicatorMode = mode;
+    document.body.className = `draw-indicator-${mode} ${gameSettings.useColors ? 'custom-colors-active' : ''}`;
+    updateInGameSettingsUI();
+}
+drawIndicatorOnBtn.addEventListener('click', () => setDrawIndicatorMode('on'));
+drawIndicatorHoverOneBtn.addEventListener('click', () => setDrawIndicatorMode('hover-one'));
+drawIndicatorHoverAllBtn.addEventListener('click', () => setDrawIndicatorMode('hover-all'));
+drawIndicatorOffBtn.addEventListener('click', () => setDrawIndicatorMode('off'));
 
 
 window.addEventListener('keydown', (e) => {
@@ -1246,10 +1296,12 @@ window.addEventListener('keydown', (e) => {
 });
 
 cells.forEach(cell => cell.addEventListener('click', handleCellClick));
+
 document.querySelectorAll('.language-option').forEach(btn => btn.addEventListener('click', (e) => {
-    const lang = e.target.closest('.language-option').dataset.lang;
+    const lang = e.target.closest('[data-lang]').dataset.lang;
     if(lang) setLanguage(lang);
 }));
+
 
 window.addEventListener('load', () => {
     initializeSettings();
