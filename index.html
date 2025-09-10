@@ -31,7 +31,7 @@
     <!-- Rules Modal -->
     <div id="rulesModal" class="modal">
         <div class="modal-content-wrapper">
-            <div class="modal-content">
+             <div class="modal-content">
                 <span class="close-button" id="rules-close-btn-x">&times;</span>
                 <div class="modal-tabs">
                     <button class="tab-link active" data-tab="howToPlayTab" id="howToPlayTabBtn">Cara Bermain</button>
@@ -62,7 +62,7 @@
     <div id="settingsModal" class="modal">
         <div class="modal-content-wrapper">
             <div class="modal-content">
-                <span class="close-button" id="settings-close-btn-x">&times;</span>
+                 <span class="close-button" id="settings-close-btn-x">&times;</span>
                 <h2 id="settingsModalTitle">Pengaturan Permainan</h2>
                 
                 <div class="setting-group">
@@ -100,7 +100,7 @@
                     </div>
 
                     <div class="setting-group">
-                        <label><span id="roundLabelText">Jumlah Babak:</span> <span id="roundValue">3</span></label>
+                        <label for="roundSlider"><span id="roundLabelText">Jumlah Babak:</span> <span id="roundValue">3</span></label>
                         <input type="range" id="roundSlider" min="1" max="10" value="3">
                     </div>
                     
@@ -155,7 +155,6 @@
                     </div>
                 </div>
                 <div id="settings-error" class="error-message"></div>
-                
                 <button id="startGameBtn" class="menu-btn">
                      <svg class="play-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M8 5V19L19 12L8 5Z"/></svg>
                      <span id="startGameBtnText">Mulai Permainan!</span>
@@ -168,7 +167,7 @@
     <div id="recapModal" class="modal">
         <div class="modal-content-wrapper">
             <div class="modal-content">
-                 <span class="close-button" id="recap-close-btn-x">&times;</span>
+                <span class="close-button" id="recap-close-btn-x">&times;</span>
                 <h2 id="recapTitle">Hasil Akhir</h2>
                 
                 <div id="recap-nav">
@@ -202,6 +201,58 @@
             </div>
         </div>
     </div>
+    
+    <!-- In-Game Settings Modal -->
+    <div id="inGameSettingsModal" class="modal">
+        <div class="modal-content-wrapper">
+            <div class="modal-content">
+                <h2 id="inGameSettingsTitle">Pengaturan Dalam Game</h2>
+                
+                 <div class="setting-group">
+                    <label id="controlsPositionLabel">Posisi Tombol Kontrol</label>
+                    <div class="option-group">
+                        <button class="option-btn" id="controlsTopBtn">Atas</button>
+                        <button class="option-btn" id="controlsCenterBtn">Tengah</button>
+                        <button class="option-btn" id="controlsBottomBtn">Bawah</button>
+                    </div>
+                </div>
+
+                <div class="setting-group">
+                    <label id="scoreboardAlignLabel">Posisi Papan Skor</label>
+                    <div class="option-group">
+                        <button class="option-btn" id="alignTopBtn">Atas</button>
+                        <button class="option-btn" id="alignCenterBtn">Tengah</button>
+                        <button class="option-btn" id="alignBottomBtn">Bawah</button>
+                    </div>
+                </div>
+
+                <div class="setting-group">
+                    <label id="drawIndicatorLabel">Penanda Seri (Mode Super)</label>
+                    <div class="option-group">
+                        <button class="option-btn" id="drawIndicatorOnBtn">Selalu Aktif</button>
+                        <button class="option-btn" id="drawIndicatorHoverBtn">Saat Hover</button>
+                        <button class="option-btn" id="drawIndicatorOffBtn">Nonaktif</button>
+                    </div>
+                </div>
+                <button id="inGameSettingsCloseBtn" class="menu-btn">Kembali</button>
+            </div>
+        </div>
+    </div>
+    
+     <!-- Exit Confirmation Modal -->
+    <div id="exitConfirmationModal" class="modal">
+        <div class="modal-content-wrapper">
+            <div class="modal-content">
+                <h2 id="exitConfirmTitle">Keluar dari Permainan?</h2>
+                <p id="exitConfirmText">Tindakan ini akan mengakhiri pertandingan saat ini dan kembali ke menu utama.</p>
+                <div class="option-group">
+                    <button class="option-btn" id="cancelExitBtn">Batal</button>
+                    <button class="option-btn" id="confirmExitBtn">Keluar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <!-- Language Dropdown -->
     <div class="language-dropdown-container">
@@ -222,59 +273,21 @@
 
     <!-- Main App Container -->
     <div id="app-container">
-         <div id="confetti-container"></div>
-         
-         <!-- In-Game Settings Modal -->
-        <div id="inGameSettingsModal" class="modal">
-            <div class="modal-content-wrapper">
-                <div class="modal-content">
-                    <h2 id="inGameSettingsTitle">Pengaturan Dalam Game</h2>
-                    
-                    <div class="setting-group">
-                        <label id="scoreboardAlignLabel">Posisi Papan Skor</label>
-                        <div class="option-group">
-                            <button class="option-btn" id="alignTopBtn">Atas</button>
-                            <button class="option-btn selected" id="alignCenterBtn">Tengah</button>
-                            <button class="option-btn" id="alignBottomBtn">Bawah</button>
-                        </div>
-                    </div>
-
-                    <div class="setting-group">
-                        <label id="drawIndicatorLabel">Penanda Seri (Mode Super)</label>
-                        <div class="option-group">
-                            <button class="option-btn selected" id="drawIndicatorOnBtn">Selalu Aktif</button>
-                            <button class="option-btn" id="drawIndicatorHoverBtn">Saat Hover</button>
-                            <button class="option-btn" id="drawIndicatorOffBtn">Nonaktif</button>
-                        </div>
-                    </div>
-
-                    <button id="inGameSettingsCloseBtn" class="menu-btn">Kembali</button>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Exit Confirmation Modal -->
-        <div id="exitConfirmationModal" class="modal">
-            <div class="modal-content-wrapper">
-                <div class="modal-content">
-                    <h2 id="exitConfirmTitle">Keluar dari Permainan?</h2>
-                    <p id="exitConfirmText">Tindakan ini akan mengakhiri pertandingan saat ini dan kembali ke menu utama.</p>
-                    <div class="option-group">
-                        <button class="option-btn" id="cancelExitBtn">Batal</button>
-                        <button class="option-btn" id="confirmExitBtn">Keluar</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-         <div id="main-content-wrapper">
+        <div id="confetti-container"></div>
+        <div id="main-content-wrapper">
             <div class="in-game-controls">
                 <button id="exitGameBtn" class="ingame-btn" title="Keluar">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 21h-4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="9 17 4 12 9 7"/><line x1="4" y1="12" x2="16" y2="12"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                        <polyline points="10 17 5 12 10 7"></polyline>
+                        <line x1="15" y1="12" x2="5" y2="12"></line>
+                    </svg>
                 </button>
                 <button id="inGameSettingsBtn" class="ingame-btn" title="Pengaturan">
-                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    </svg>
                 </button>
             </div>
             <div class="game-container">
@@ -299,6 +312,7 @@
             
             <div id="info-panel">
                 <div id="scoreboard-container">
+                    <div id="match-display-ingame"></div>
                     <h2 id="round-title">Babak</h2>
                     <div id="round-display">1 DARI 3</div>
                     <div class="player-info-container">
@@ -328,4 +342,3 @@
     <script src="script.js"></script>
 </body>
 </html>
-
