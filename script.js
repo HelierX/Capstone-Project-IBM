@@ -26,6 +26,7 @@ const roundTitle = document.querySelector('#round-title');
 const roundResultStatus = document.querySelector('#round-result-status');
 const gameContainer = document.querySelector('.game-container');
 const confettiContainer = document.getElementById('confetti-container');
+const matchDisplayInGame = document.querySelector('#match-display-ingame');
 
 // Recap Modal Elements
 const recapTitle = document.querySelector('#recapTitle');
@@ -104,6 +105,11 @@ const mainContentWrapper = document.querySelector('#main-content-wrapper');
 const exitConfirmationModal = document.querySelector('#exitConfirmationModal');
 const cancelExitBtn = document.querySelector('#cancelExitBtn');
 const confirmExitBtn = document.querySelector('#confirmExitBtn');
+const infoPanel = document.querySelector('#info-panel');
+const inGameControls = document.querySelector('.in-game-controls');
+const controlsTopBtn = document.querySelector('#controlsTopBtn');
+const controlsCenterBtn = document.querySelector('#controlsCenterBtn');
+const controlsBottomBtn = document.querySelector('#controlsBottomBtn');
 
 
 // Game State
@@ -125,6 +131,7 @@ let gameSettings = {
     match1Round1Starter: 'p1',
     useTieBreaker: false,
     scoreboardAlign: 'center',
+    controlsAlign: 'top',
     drawIndicatorMode: 'on'
 };
 let settingsCache = {
@@ -192,6 +199,7 @@ const translations = {
         recapTitle: "Hasil Akhir",
         recapHistoryTitle: "Riwayat Babak",
         recapCloseBtn: "Kembali",
+        matchDisplayLabel: (matchNum) => `Pertandingan ${matchNum}`,
         recapMatchLabel: (matchNum) => `Pertandingan ${matchNum}`,
         recapRoundItem: (winnerName) => `${winnerName}`,
         recapRoundDraw: "SERI",
@@ -226,7 +234,8 @@ const translations = {
         exitConfirmTitle: 'Keluar dari Permainan?',
         exitConfirmText: 'Tindakan ini akan mengakhiri pertandingan saat ini dan kembali ke menu utama.',
         cancel: 'Batal',
-        exit: 'Keluar'
+        exit: 'Keluar',
+        controlsPositionLabel: 'Posisi Tombol Kontrol'
     },
     en: {
         gameTitleNormal: "Tic Tac Toe",
@@ -264,6 +273,7 @@ const translations = {
         recapTitle: "Final Result",
         recapHistoryTitle: "Round History",
         recapCloseBtn: "Back",
+        matchDisplayLabel: (matchNum) => `Match ${matchNum}`,
         recapMatchLabel: (matchNum) => `Match ${matchNum}`,
         recapRoundItem: (winnerName) => `${winnerName}`,
         recapRoundDraw: "TIE",
@@ -298,7 +308,8 @@ const translations = {
         exitConfirmTitle: 'Exit Game?',
         exitConfirmText: 'This will end the current match and return you to the main menu.',
         cancel: 'Cancel',
-        exit: 'Exit'
+        exit: 'Exit',
+        controlsPositionLabel: 'Controls Position'
     }
 };
 
@@ -330,7 +341,11 @@ function setLanguage(lang) {
         exitConfirmTitle: t.exitConfirmTitle,
         exitConfirmText: t.exitConfirmText,
         cancelExitBtn: t.cancel,
-        confirmExitBtn: t.exit
+        confirmExitBtn: t.exit,
+        controlsPositionLabel: t.controlsPositionLabel,
+        controlsTopBtn: t.alignTop,
+        controlsCenterBtn: t.alignCenter,
+        controlsBottomBtn: t.alignBottom
     };
 
     for (const id in elementsToTranslate) {
@@ -338,6 +353,10 @@ function setLanguage(lang) {
         if(el) el.textContent = elementsToTranslate[id];
     }
     
+    howToPlayNormalContent.innerHTML = t.howToPlayNormalContent;
+    howToPlaySuperContent.innerHTML = t.howToPlaySuperContent;
+    rulesContent.innerHTML = t.rulesContent;
+
     document.querySelector('#alternateTurnsLabel span').textContent = t.alternateTurnsLabel;
     document.querySelector('#alternateRematchLabel span').textContent = t.alternateRematchLabel;
     document.querySelector('#tieBreakerLabel span').textContent = t.tieBreakerLabel;
@@ -368,13 +387,13 @@ function setLanguage(lang) {
             statusDisplay.textContent = t.playerXTurn(currentPlayerName, currentPlayer);
         }
         roundDisplay.textContent = t.roundStatus(currentRound, gameSettings.totalRounds);
+        matchDisplayInGame.textContent = t.matchDisplayLabel(matchCount);
         updateEndGameButtons();
         if (recapModal.classList.contains('active')) {
             populateRecapModal(currentRecapMatch);
         }
     }
     
-    // PERBAIKAN: Perbarui teks seri jika papan sudah ditampilkan
     if (superBoard.style.display === 'grid') {
         updateDrawMarkersLanguage();
     }
@@ -399,8 +418,8 @@ function checkWinner(boardState) {
             return { winner: boardState[a], line: winningConditions[i] };
         }
     }
-    if (!boardState.includes('')) return { winner: 'D', line: [] }; // Draw
-    return { winner: null, line: [] }; // No winner yet
+    if (!boardState.includes('')) return { winner: 'D', line: [] };
+    return { winner: null, line: [] };
 }
 
 function handleCellPlayed(clickedCell, symbol) {
@@ -534,7 +553,7 @@ function handleCellClick(e) {
         handleCellPlayed(clickedCell, currentPlayer);
         handleNormalResultValidation();
 
-    } else { // Super Mode Logic
+    } else {
         const clickedCell = e.target.closest('.super-cell');
         if (!clickedCell) return;
 
@@ -986,6 +1005,26 @@ function toggleSettingsVisibility() {
     tieBreakerSetting.style.display = isSuper ? 'flex' : 'none';
 }
 
+function updateInGameSettingsUI() {
+    // Controls Position
+    document.querySelector('#controlsPositionLabel + .option-group .selected')?.classList.remove('selected');
+    if (gameSettings.controlsAlign === 'top') controlsTopBtn.classList.add('selected');
+    else if (gameSettings.controlsAlign === 'center') controlsCenterBtn.classList.add('selected');
+    else controlsBottomBtn.classList.add('selected');
+
+    // Scoreboard Position
+    document.querySelector('#scoreboardAlignLabel + .option-group .selected')?.classList.remove('selected');
+    if (gameSettings.scoreboardAlign === 'top') alignTopBtn.classList.add('selected');
+    else if (gameSettings.scoreboardAlign === 'center') alignCenterBtn.classList.add('selected');
+    else alignBottomBtn.classList.add('selected');
+
+    // Draw Indicator
+    document.querySelector('#drawIndicatorLabel + .option-group .selected')?.classList.remove('selected');
+    if (gameSettings.drawIndicatorMode === 'on') drawIndicatorOnBtn.classList.add('selected');
+    else if (gameSettings.drawIndicatorMode === 'hover') drawIndicatorHoverBtn.classList.add('selected');
+    else drawIndicatorOffBtn.classList.add('selected');
+}
+
 // Event Listeners
 newGameBtn.addEventListener('click', () => {
     mainMenuScreen.classList.remove('active');
@@ -1132,27 +1171,50 @@ cancelExitBtn.addEventListener('click', () => {
 });
 confirmExitBtn.addEventListener('click', returnToMainMenu);
 
-inGameSettingsBtn.addEventListener('click', () => inGameSettingsModal.classList.add('active'));
+inGameSettingsBtn.addEventListener('click', () => {
+    updateInGameSettingsUI();
+    inGameSettingsModal.classList.add('active');
+});
 inGameSettingsCloseBtn.addEventListener('click', () => inGameSettingsModal.classList.remove('active'));
 
 alignTopBtn.addEventListener('click', () => {
     gameSettings.scoreboardAlign = 'top';
-    mainContentWrapper.className = 'align-top';
+    infoPanel.className = 'info-panel scoreboard-align-top';
     document.querySelector('#scoreboardAlignLabel + .option-group .selected').classList.remove('selected');
     alignTopBtn.classList.add('selected');
 });
 alignCenterBtn.addEventListener('click', () => {
     gameSettings.scoreboardAlign = 'center';
-    mainContentWrapper.className = '';
+    infoPanel.className = 'info-panel'; // default is center
     document.querySelector('#scoreboardAlignLabel + .option-group .selected').classList.remove('selected');
     alignCenterBtn.classList.add('selected');
 });
 alignBottomBtn.addEventListener('click', () => {
     gameSettings.scoreboardAlign = 'bottom';
-    mainContentWrapper.className = 'align-bottom';
+    infoPanel.className = 'info-panel scoreboard-align-bottom';
     document.querySelector('#scoreboardAlignLabel + .option-group .selected').classList.remove('selected');
     alignBottomBtn.classList.add('selected');
 });
+
+controlsTopBtn.addEventListener('click', () => {
+    gameSettings.controlsAlign = 'top';
+    inGameControls.className = 'in-game-controls controls-align-top';
+    document.querySelector('#controlsPositionLabel + .option-group .selected').classList.remove('selected');
+    controlsTopBtn.classList.add('selected');
+});
+controlsCenterBtn.addEventListener('click', () => {
+    gameSettings.controlsAlign = 'center';
+    inGameControls.className = 'in-game-controls controls-align-center';
+    document.querySelector('#controlsPositionLabel + .option-group .selected').classList.remove('selected');
+    controlsCenterBtn.classList.add('selected');
+});
+controlsBottomBtn.addEventListener('click', () => {
+    gameSettings.controlsAlign = 'bottom';
+    inGameControls.className = 'in-game-controls controls-align-bottom';
+    document.querySelector('#controlsPositionLabel + .option-group .selected').classList.remove('selected');
+    controlsBottomBtn.classList.add('selected');
+});
+
 
 drawIndicatorOnBtn.addEventListener('click', () => {
     gameSettings.drawIndicatorMode = 'on';
@@ -1204,5 +1266,5 @@ window.addEventListener('load', () => {
     toggleSettingsVisibility();
     
     document.body.classList.add('draw-indicator-on');
+    updateInGameSettingsUI();
 });
-
