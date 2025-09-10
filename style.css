@@ -55,16 +55,12 @@ body {
 #main-content-wrapper {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
-    align-items: center; /* Default alignment */
-    justify-content: center;
+    justify-content: center; /* Menengahkan seluruh grid */
     gap: 25px; 
     width: 100%;
     max-width: 1200px;
     margin: 0 auto;
 }
-#main-content-wrapper.align-top { align-items: start; }
-#main-content-wrapper.align-bottom { align-items: end; }
-
 
 .in-game-controls {
     grid-column: 1 / 2;
@@ -72,24 +68,31 @@ body {
     flex-direction: column;
     gap: 15px;
     justify-self: end; /* Rata kanan di dalam kolomnya */
+    align-self: start; /* Default: Atas */
 }
+.in-game-controls.controls-align-center { align-self: center; }
+.in-game-controls.controls-align-bottom { align-self: end; }
+
 
 .game-container {
     grid-column: 2 / 3;
     max-width: fit-content; /* Ukuran pas dengan konten */
-    margin: 0 auto; /* Menengahkan */
 }
 #info-panel {
     grid-column: 3 / 4;
     justify-self: start; /* Rata kiri di dalam kolomnya */
+    align-self: center; /* Default: Tengah */
 }
+#info-panel.scoreboard-align-top { align-self: start; }
+#info-panel.scoreboard-align-bottom { align-self: end; }
+
 
 .ingame-btn {
     background-color: #2e3048;
     color: #b0b0d0;
     border: none;
-    width: 60px; /* Diperbesar */
-    height: 60px; /* Diperbesar */
+    width: 64px; /* Diperbesar */
+    height: 64px; /* Diperbesar */
     border-radius: 50%;
     cursor: pointer;
     display: flex;
@@ -99,8 +102,8 @@ body {
     transition: background-color 0.2s, color 0.2s, transform 0.1s;
 }
 .ingame-btn svg {
-    width: 32px; /* Ikon diperbesar */
-    height: 32px;
+    width: 48px; /* Ikon diperbesar maksimal */
+    height: 48px;
 }
 .ingame-btn:hover {
     background-color: #3b3c5a;
@@ -118,6 +121,15 @@ body {
     width: 320px;
     flex-shrink: 0;
     box-sizing: border-box;
+}
+
+#match-display-ingame {
+    font-size: 0.9em;
+    font-weight: bold;
+    color: #b0b0d0;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 #round-title {
@@ -637,6 +649,19 @@ body.custom-colors-active .player-info.active .indicator.p2-color { background-c
     text-align: left;
     width: 100%;
 }
+
+#inGameSettingsModal .setting-group {
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #4c4d6a;
+}
+#inGameSettingsModal .setting-group:last-of-type {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+
 .setting-group label {
     display: inline-flex;
     align-items: center;
@@ -654,16 +679,9 @@ body.custom-colors-active .player-info.active .indicator.p2-color { background-c
 }
 
 .toggle-label {
-    display: inline-flex;
-    align-items: center;
-    justify-content: flex-start;
     flex-grow: 1;
     padding-right: 15px;
     font-size: 1.1em;
-}
-.toggle-label span {
-    display: inline-flex;
-    align-items: center;
 }
 
 .setting-group.toggle-group label.toggle-switch {
@@ -1053,6 +1071,7 @@ input:checked + .slider:before { transform: translateX(26px); }
     cursor: help;
     position: relative;
     flex-shrink: 0;
+    vertical-align: middle;
 }
 .tooltip-icon::after {
     content: attr(data-tooltip);
@@ -1208,10 +1227,8 @@ body.custom-colors-active.p2-turn .small-board.predict-highlight {
     font-weight: bold;
     z-index: 10;
     border-radius: 5px;
-    background-color: rgba(26, 26, 46, 0.8);
-    visibility: hidden;
-    opacity: 0;
-    transition: opacity 0.2s, visibility 0.2s;
+    transition: background-color 0.2s;
+    pointer-events: none; /* Make overlay non-blocking by default */
 }
 
 .small-board-overlay .o-char-svg {
@@ -1224,12 +1241,13 @@ body.custom-colors-active.p2-turn .small-board.predict-highlight {
 .small-board-overlay .x-char {
     font-size: 6em;
     line-height: 1;
+    transition: opacity 0.2s, visibility 0.2s;
 }
 
 .small-board.board-won .small-board-overlay,
 .small-board.board-draw .small-board-overlay {
-    visibility: visible;
-    opacity: 1;
+    background-color: rgba(26, 26, 46, 0.8);
+    pointer-events: auto; /* Make it blocking once completed */
 }
 
 .small-board.board-won .small-board-overlay {
@@ -1238,23 +1256,25 @@ body.custom-colors-active.p2-turn .small-board.predict-highlight {
 body.custom-colors-active .small-board.board-won.board-won-X .small-board-overlay { color: var(--p1-color); }
 body.custom-colors-active .small-board.board-won.board-won-O .small-board-overlay { color: var(--p2-color); }
 
-.small-board.board-draw .small-board-overlay {
+.small-board.board-draw .small-board-overlay .x-char {
     color: #888;
 }
 
-body.draw-indicator-on .small-board.board-draw .small-board-overlay {
+body.draw-indicator-on .small-board.board-draw .small-board-overlay .x-char {
     visibility: visible;
     opacity: 1;
 }
-body.draw-indicator-hover .small-board.board-draw .small-board-overlay {
+
+body.draw-indicator-hover .small-board.board-draw .small-board-overlay .x-char {
     visibility: hidden;
     opacity: 0;
 }
-body.draw-indicator-hover .small-board.board-draw:hover .small-board-overlay {
+body.draw-indicator-hover .small-board.board-draw:hover .small-board-overlay .x-char {
     visibility: visible;
     opacity: 1;
 }
-body.draw-indicator-off .small-board.board-draw .small-board-overlay {
+
+body.draw-indicator-off .small-board.board-draw .small-board-overlay .x-char {
     visibility: hidden;
     opacity: 0;
 }
@@ -1333,4 +1353,3 @@ body.draw-indicator-off .small-board.board-draw .small-board-overlay {
 .tie-breaker-setting.visible {
     display: flex;
 }
-
